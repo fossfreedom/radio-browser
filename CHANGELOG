@@ -1,0 +1,50 @@
+Changes in 2.4:
+===============
+* works in 0.13.3
+* removed shoutcast support (now you need developer id)
+
+Changes in 2.3.1:
+=================
+* added stream chooser dialog if station has multiple streams urls
+* some bugfixes
+* updated translations
+
+Changes in 2.3:
+===============
+* new search tab
+* moved board to new server: http://www.radio-browser.info
+* start page has resizer-handle now
+* translation updates
+* some bugfixes
+
+Changes in 2.2:
+===============
+* added new tab, that displays favourites for faster access on program start
+
+Changes in 2.1:
+===============
+* gio library dependency is not needed any more
+* new source radiotime
+* translation updates
+
+Changes in 2.0:
+===============
+* more translations
+* recording streams creates a new tab for each recording
+* recently played entries get removed after a configurable time
+* streamripper overwrites the older file if the newer one with the same title is bigger
+* display station count in each subtree
+* group bitrate by steps of 32 and bigger ones than 512 to invalid
+
+Changes in 1.9:
+===============
+* new view to display search(filter) results
+* rewrite of some parts -> more stability
+* new icon set
+* automatic update of some feeds(icecast, local), if local copy is at least 1 day older than server version
+* station click hitlist on http://segler.bplaced.net
+* new install scrypt, for per user install
+* special sorting (by bitrate, genre, streamtype, country) for each feed
+* removed right click in tree in favour of buttons in infobox
+* added german translation
+* more error dialogs

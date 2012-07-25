@@ -1,0 +1,12 @@
+Per User Install (Default)
+==========================
+1) just unpack archive (which you did, in order to get to read this :)
+2) cd to it
+3) ./install.sh
+4) restart rhythmbox and activate plugin in options
+
+System Install
+==============
+1) unpack archive
+2) make
+3) restart rhythmbox and activate plugin in options

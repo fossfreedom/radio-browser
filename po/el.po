@@ -1,0 +1,404 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: rhythmbox-radio-browser\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-03-29 19:18:35 UTC\n"
+"PO-Revision-Date: 2010-11-16 20:08:09 UTC\n"
+"Last-Translator: Web Translate It <support@webtranslateit.com>\n"
+"Language-Team: Greek\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Web Translate It\n"
+
+#: ../radio_browser_source.py
+msgid "Added to recently played at"
+msgstr "Προστέθηκε στα πρόσφατα αναπαραχθέντα την"
+
+#: ../radio_browser_source.py
+#: ../record_process.py
+msgid "Bitrate"
+msgstr "Bitrate"
+
+#: ../radio_browser_source.py
+# Всё же это "В закладки", а то назначение кнопки не очевидно.
+msgid "Bookmark"
+msgstr "Σελιδοδείκτης"
+
+#: ../radio_browser_source.py
+#. add bookmarks
+msgid "Bookmarks"
+msgstr "Σελιδοδείκτες"
+
+#: ../radio-browser.py
+msgid "Browser"
+msgstr "Περιηγητής"
+
+#: ../radio_browser_source.py
+msgid "By Bitrate"
+msgstr "Κατά Bitrate"
+
+#: ../radio_browser_source.py
+msgid "By Country"
+msgstr "Κατά Χώρα"
+
+#: ../radio_browser_source.py
+msgid "By Genres"
+msgstr "Κατά Τεχνοτροπία"
+
+#: ../radio_browser_source.py
+msgid "By Streamtype"
+msgstr "Κατά Τύπο Ροής"
+
+#: ../board_handler.py
+msgid "Classical Jazz Talk"
+msgstr "Κλασσική Jazz Ομιλία"
+
+#: ../radio-browser.py
+msgid "Clear icon cache"
+msgstr "Άδειασμα της προσωρινής μνήμης εικονιδίων"
+
+#: ../radio_browser_source.py
+msgid "Click statistics (Last 30 days)"
+msgstr "Στατιστικά (Τελευταίες 30 μέρες)"
+
+#: ../radio_browser_source.py
+msgid "Could not download feed. Please try again later."
+msgstr "Δεν μπορώ να κατεβάσω τη τροφοδοσία. Παρακαλώ προσπαθείστε αργότερα."
+
+#: ../radio_browser_source.py
+msgid "Could not download station information"
+msgstr "Δεν μπόρεσα να κατεβάσω πληροφορίες για το σταθμό"
+
+#: ../radio_browser_source.py
+msgid "Could not download station information from shoutcast directory server. Please try again later."
+msgstr "Δεν μπορώ να κατεβάσω τις πληροφορίες για το σταθμό από τον εξυπηρετητή shoutcast. Παρακαλώ δοκιμάστε αργότερα"
+
+#: ../board_handler.py
+#: ../radio_browser_source.py
+msgid "Country"
+msgstr "Χώρα"
+
+#: ../radio_browser_source.py
+msgid "Current listeners"
+msgstr "Ποιοι ακούν τώρα"
+
+#: ../record_process.py
+msgid "Current song"
+msgstr "Τρέχον τραγούδι"
+
+#: ../radio_browser_source.py
+msgid "Current song (on last refresh)"
+msgstr "Τρέχον τραγούδι (μετά από την τελευταία ανανέωση)"
+
+#: ../radio_browser_source.py
+msgid "Description"
+msgstr "Περιγραφή"
+
+#: ../board_handler.py
+msgid "Do you really want to mark this radio station as broken? It will eventually get deleted if enough people do that! More information on that on the feeds homepage: http://www.radio-browser.info/"
+msgstr "Θέλετε πραγματικά να σημειώσετε αυτόν το σταθμό; Θα διαγραφεί αν αρκετοί χρήστες κάνουν αυτή την ενέργεια! Περισσότερες πληροφορίες γι' αυτό στην ιστοσελίδα: http://segler.bplaced.net/"
+
+#: ../board_handler.py
+# "Вы" пишется с большой буквы только в официальных сообщениях и личной переписке для выделения уважительного отношения к собеседнику (весьма конкретному собеседнику). Во всех остальных случаях местоимение "вы" пишется со строчной. В данном случае написание с большой буквы не оправдано.
+msgid "Do you really want to vote for this station? It means, that you like it, and you want more people to know, that this is a good station."
+msgstr "Θέλετε πραγματικά να ψηφίσετε αυτόν το Σταθμό; Αυτό σημαίνει ότ σας αρέσει και θέλετε να ξέρουν περισσότεροι άνθρωποι, ότι είναι καλός."
+
+#: ../radio_browser_source.py
+msgid "Download"
+msgstr "Κατέβασμα"
+
+#: ../radio_browser_source.py
+msgid "Downloading feed %(name)s from %(url)s. %(try)d/%(trys)d"
+msgstr "Κατέβασμα τροφοδοσίας %(name)s από %(url)s. %(try)d/%(trys)d"
+
+#: ../radio_browser_source.py
+msgid "downloading station information"
+msgstr "Κατέβασμα πληροφοριών σταθμού"
+
+#: ../radio_browser_source.py
+# audio/mpeg, например.
+msgid "Entry type"
+msgstr "Τύπος Εισόδου"
+
+#: ../board_handler.py
+msgid "Esperanto"
+msgstr "Εσπεράντο"
+
+#: ../board_handler.py
+msgid "Examples"
+msgstr "Παραδείγματα"
+
+#: ../board_handler.py
+msgid "Favicon URL"
+msgstr "URL Εικονιδίου"
+
+#: ../board_handler.py
+msgid "Favicon URL needs to start with http://"
+msgstr "Το URL του εικονιδίου πρέπει να αρχίζει με http://"
+
+#: ../radio_browser_source.py
+#: ../radio_browser_source.py
+msgid "Favourites"
+msgstr "Αγαπημένα"
+
+#: ../radio_browser_source.py
+msgid "Feed"
+msgstr "Τροφοδοσία"
+
+#: ../radio_browser_source.py
+msgid "Feed download failed"
+msgstr "Το κατέβασμα τροφοδοσίας απέτυχε"
+
+#: ../radio_browser_source.py
+msgid "Feed homepage"
+msgstr "Ιστοσελίδα τροφοδοσίας"
+
+#: ../radio_browser_source.py
+msgid "Feed source"
+msgstr "Πηγή τροφοδοσίας"
+
+#: ../record_process.py
+msgid "Filesize"
+msgstr "Μέγεθος αρχείου"
+
+#: ../radio_browser_source.py
+msgid "Filter"
+msgstr "Φίλτρο"
+
+#: ../radio_browser_source.py
+msgid "Genre"
+msgstr "Τεχνοτροπία"
+
+#: ../radio_browser_source.py
+msgid "Homepage"
+msgstr "Αρχική Σελίδα"
+
+#: ../board_handler.py
+msgid "Homepage URL"
+msgstr "Αρχική Σελίδα"
+
+#: ../board_handler.py
+msgid "Homepage URL needs to start with http://"
+msgstr "Το URL της αρχικής σελίδας πρέπει να ξεκινά με http://"
+
+#: ../board_handler.py
+msgid "http://listen.to.my/station.pls"
+msgstr "http://listen.to.my/station.pls"
+
+#: ../board_handler.py
+msgid "http://very.cool.site"
+msgstr "http://very.cool.site"
+
+#: ../board_handler.py
+msgid "http://very.cool.site/favicon.ico"
+msgstr "http://very.cool.site/favicon.ico"
+
+#: ../radio_browser_source.py
+msgid "Info box"
+msgstr "Τμήμα Πληροφοριών"
+
+#: ../radio_browser_source.py
+msgid "Integrating feed %(name)s (%(itemcount)d items) into tree..."
+msgstr "Ελεγχος αρτιότητας τροφοδοσίας %(name)s (%(itemcount)d αντικείμενα) στο δέντρο..."
+
+#: ../radio-browser.rb-plugin.in.h
+msgid "Internet radio station browser"
+msgstr "Internet radio station browser"
+
+#: ../radio_browser_source.py
+msgid "Invalid"
+msgstr "Μη έγκυρο"
+
+#: ../board_handler.py
+#: ../radio_browser_source.py
+msgid "Language"
+msgstr "Γλώσσα"
+
+#: ../radio_browser_source.py
+msgid "Last update"
+msgstr "Τελευταία ενημέρωση"
+
+#: ../radio_browser_source.py
+msgid "Loading %(url)s"
+msgstr "Φόρτωση %(url)s"
+
+#: ../radio_browser_source.py
+msgid "Loading feed %(name)s"
+msgstr "Φόρτωμα ροής  %(name)s"
+
+#: ../board_handler.py
+msgid "Mark station as broken"
+msgstr "Σήμανση σταθμού ως σπασμένου"
+
+#: ../board_handler.py
+msgid "My Station"
+msgstr "Ο Σταθμός μου"
+
+#: ../board_handler.py
+#: ../radio_browser_source.py
+msgid "Name"
+msgstr "Όνομα"
+
+#: ../board_handler.py
+msgid "Name and URL are necessary"
+msgstr "Όνομα και URL είναι υποχρεωτικά"
+
+#: ../radio_browser_source.py
+msgid "Negative votes"
+msgstr "Αρνητικοί ψήφοι"
+
+#: ../radio_browser_source.py
+msgid "No local copy"
+msgstr "Όχι τοπικό αντίγραφο"
+
+#: ../radio_browser_source.py
+msgid "Nothing"
+msgstr "Τίποτα"
+
+#: ../radio_browser_source.py
+msgid "Play"
+msgstr "Αναπαραγωγή"
+
+#: ../record_process.py
+msgid "Playing time"
+msgstr "Διάρκεια"
+
+#: ../board_handler.py
+msgid "Post new station"
+msgstr "Αποστολή νέου σταθμού"
+
+#: ../radio-browser.py
+# Звучит как два не связанных слова. Может "Радиостанции" будет лучше? Не дословно, но хоть не разваливается на куски.
+msgid "Radio browser"
+msgstr "Radio browser"
+
+#: ../radio-browser.py
+msgid "Radio Browser Configuration"
+msgstr "Ρύθμιση του Radio Browser"
+
+#: ../radio_browser_source.py
+msgid "Radiostation list"
+msgstr "Λίστα Ραδιοφωνικών Σταθμών"
+
+#: ../radio_browser_source.py
+#. add recently played list
+msgid "Recently played"
+msgstr "Πρόσφατα αναπαραχθέντα"
+
+#: ../radio-browser.py
+msgid "Recently played removal time(days)"
+msgstr "Χρόνος αφαίρεσης πρόσφατα αναπαραχθέντων. (ημέρες)"
+
+#: ../radio_browser_source.py
+msgid "Record"
+msgstr "Εγγραφή"
+
+#: ../radio_browser_source.py
+msgid "Redownload"
+msgstr "Επανάληψη κατεβάσματος"
+
+msgid "Relay port"
+msgstr "Θύρα αναμετάδοσης"
+
+#: ../record_process.py
+msgid "Ripping stream"
+msgstr "Μετατροπή ροής"
+
+#: ../radio_browser_source.py
+#: ../radio_browser_source.py
+msgid "Search"
+msgstr "Εύρεση"
+
+#: ../radio_browser_source.py
+msgid "Searching for : '%s'"
+msgstr "Ψάχνω για : '%s'"
+
+#: ../record_process.py
+msgid "Server"
+msgstr "Εξυπηρετητής"
+
+#: ../radio_browser_source.py
+msgid "Server type"
+msgstr "Τύπος Εξυπηρετητή"
+
+#: ../radio-browser.rb-plugin.in.h
+msgid "Shows icecast and shoutcast radio stations on a tab."
+msgstr "Εμφανίζει ραδιοφωνικούς σταθμούς,  icecast και shoutcast, σε μια καρτέλα."
+
+#: ../radio_browser_source.py
+msgid "Source feed"
+msgstr "Τύπος Τροφοδοσίας"
+
+#: ../board_handler.py
+msgid "Station is broken"
+msgstr "Ο Σταθμός δεν υπάρχει"
+
+#: ../board_handler.py
+msgid "Station successfully posted"
+msgstr "Ο σταθμός καταχωρήθηκε επιτυχώς"
+
+#: ../record_process.py
+msgid "Stream"
+msgstr "Ροή"
+
+#: ../radio_browser_source.py
+# Всё же URL-адрес понятнее, чем "путь потока". Куда он течёт? ж)
+msgid "Stream URL"
+msgstr "URL ροής"
+
+#: ../radio-browser.py
+msgid "Streamripper output path"
+msgstr "Διαδρομή εγγραφής ροής"
+
+#: ../board_handler.py
+#: ../radio_browser_source.py
+msgid "Tags"
+msgstr "Σημειώσεις"
+
+#: ../record_process.py
+msgid "Time"
+msgstr "Χρόνος"
+
+#: ../radio_browser_source.py
+#: ../record_process.py
+#. create the view"Title",gtk.CellRendererText(),text=0)
+msgid "Title"
+msgstr "Τίτλος"
+
+#: ../radio_browser_source.py
+msgid "Try"
+msgstr "Δοκιμή"
+
+#: ../radio-browser.py
+msgid "Trys to download file"
+msgstr "Προσπάθειες για κατέβασμα αρχείου"
+
+#: ../radio_browser_source.py
+msgid "Unbookmark"
+msgstr "Αφαίρεση από τους σελιδοδείκτες"
+
+#: ../radio-browser.py
+#. add "update-all" action to the toolbar
+msgid "Update radio station list"
+msgstr "Ενημέρωση της λίστας ραδιοφωνικών σταθμών"
+
+#: ../board_handler.py
+msgid "URL"
+msgstr "URL"
+
+#: ../board_handler.py
+msgid "URL needs to start with http:// or mms://"
+msgstr "Το URL πρέπει να ξεκινά με http:// ή mms://"
+
+#: ../board_handler.py
+msgid "Utopia"
+msgstr "Ουτοπία"
+
+#: ../board_handler.py
+msgid "Vote for station"
+msgstr "Ψηφίστε για το Σταθμό"
+
+#: ../radio_browser_source.py
+msgid "Votes"
+msgstr "Ψήφοι"
