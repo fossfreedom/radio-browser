@@ -15,16 +15,22 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Radio-Browser-Plugin.  If not, see <http://www.gnu.org/licenses/>.
 
+from threading import Thread
 import threading
 from gi.repository import GObject
 import subprocess
 from gi.repository import Gtk
+from gi.repository import GLib
+from gi.repository import Gdk
 import os
 from datetime import datetime
 
 import xml.sax.saxutils
 
 from radio_station import RadioStation
+
+GLib.threads_init()
+
 
 class RecordProcess(threading.Thread,Gtk.VBox):
 	def __init__(self,station,outputpath,play_cb,shell):
@@ -48,6 +54,8 @@ class RecordProcess(threading.Thread,Gtk.VBox):
 
 		# prepare streamripper
 		commandline = ["streamripper",uri,"-d",outputpath,"-r","-o","larger"]
+		print "streamripper commandline"
+		print commandline
 		self.process = subprocess.Popen(commandline,stdout=subprocess.PIPE)
 
 		# infobox
@@ -57,14 +65,15 @@ class RecordProcess(threading.Thread,Gtk.VBox):
 
 		right = Gtk.VBox()
 		play_button = Gtk.Button(stock=Gtk.STOCK_MEDIA_PLAY,label="")
-		right.pack_start(play_button)
+		right.pack_start(play_button, False, False, 0) #dm
 		stop_button = Gtk.Button(stock=Gtk.STOCK_STOP,label="")
-		right.pack_start(stop_button)
+		right.pack_start(stop_button, False, False, 0) #dm
 
 		box = Gtk.HBox()
-		box.pack_start(left)
-		box.pack_start(right,False)
-		decorated_box = Gtk.Frame(_("Ripping stream"))
+		box.pack_start(left, False, False, 0) #dm
+		box.pack_start(right,False, False, 0) #dm was just Falses
+		decorated_box = Gtk.Frame()
+		decorated_box.set_label("Ripping stream")
 		decorated_box.add(box)
 
 		play_button.connect("clicked",self.record_play_button_handler,uri)
@@ -74,7 +83,7 @@ class RecordProcess(threading.Thread,Gtk.VBox):
 		self.songlist = Gtk.TreeView()
 		self.songlist.connect('row-activated', self.open_file)
 		self.songlist_store = Gtk.TreeStore(int,str,str)
-		self.songlist_store.set_sort_column_id(0,Gtk.SORT_DESCENDING)
+		self.songlist_store.set_sort_column_id(0,Gtk.SortType.DESCENDING)
 		self.songlist.set_model(self.songlist_store)
 
 		column_time_cell = Gtk.CellRendererText()
@@ -93,12 +102,12 @@ class RecordProcess(threading.Thread,Gtk.VBox):
 		self.songlist.append_column(column_size)
 
 		tree_view_container = Gtk.ScrolledWindow()
-		tree_view_container.set_shadow_type(Gtk.SHADOW_IN)
+		tree_view_container.set_shadow_type(Gtk.ShadowType.IN)
 		tree_view_container.add(self.songlist)
-		tree_view_container.set_property("hscrollbar-policy", Gtk.POLICY_AUTOMATIC)
+		tree_view_container.set_property("hscrollbar-policy", Gtk.PolicyType.AUTOMATIC)
 
-		self.pack_start(decorated_box,False)
-		self.pack_start(tree_view_container)
+		self.pack_start(decorated_box,False,False,0) #dm was just false
+		self.pack_start(tree_view_container,True,True,0) #dm
 		self.show_all()
 
 	def open_file(self, treeview, path, column):
@@ -112,7 +121,7 @@ class RecordProcess(threading.Thread,Gtk.VBox):
 		t.start()
 		return
 
-	def display_cb(self,column,cell,model,iter):
+	def display_cb(self,column,cell,model,iter, another):
 		seconds = model.get_value(iter,0)
 		cell.set_property("text",datetime.fromtimestamp(seconds).strftime("%x %X"))
 
@@ -216,10 +225,10 @@ class RecordProcess(threading.Thread,Gtk.VBox):
 
 		print "thread closed"
 		
-		Gtk.gdk.threads_enter()
+		Gdk.threads_enter()
 		self.get_parent().set_current_page(0)
 		self.get_parent().remove(self)
-		Gtk.gdk.threads_leave()
+		Gdk.threads_leave()
 
 	def stop(self):
 		if self.process.poll() is None:
