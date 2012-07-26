@@ -227,6 +227,12 @@ class RadioBrowserSource(RB.StreamingSource):
 			filterbox.pack_start(self.filter_entry_genre,False,False,0)
 			filterbox.pack_start(Gtk.Label(_("Bitrate")+":"),False,False,0)
 			filterbox.pack_start(self.filter_entry_bitrate,False,False,0)
+			reseticoncachebutton = Gtk.Button(_("Cache"))
+			reseticoncachebutton.connect("clicked",self.clear_iconcache_button_clicked)
+			filterbox.pack_start(reseticoncachebutton,False,False,0)
+			updatecachebutton = Gtk.Button(_("Update"))
+			updatecachebutton.connect("clicked",self.update_button_clicked)
+			filterbox.pack_start(updatecachebutton,False,False,0)
 
 			self.start_box = Gtk.HPaned()
 
@@ -993,7 +999,7 @@ class RadioBrowserSource(RB.StreamingSource):
 			return True
 
 	""" handler for update toolbar button """
-	def update_button_clicked(self):
+	def update_button_clicked(self,widget):
 		if not self.updating:
 			# delete cache files
 			files = os.listdir(self.cache_dir)
@@ -1004,7 +1010,7 @@ class RadioBrowserSource(RB.StreamingSource):
 			# start filling again
 			self.refill_list()
 
-	def clear_iconcache_button_clicked(self):
+	def clear_iconcache_button_clicked(self, widget):
 		if not self.updating:
 			# delete cache files
 			files = os.listdir(self.icon_cache_dir)
