@@ -5,7 +5,9 @@ GTK3+ port from original source https://github.com/segler-alex/rhythmbox-radio-b
 for Rhythmbox 2.96
 
 Current situation as of:
-25 Jul 2012 - not fully working port as yet. GUI mostly ported. It does play radio-stations from the default list
+26 Jul 2012 - not fully working port as yet. GUI mostly ported. 
+
+It does play radio-stations from the default list and you can search for new radio stations
 
 Help needed! 
 ============
@@ -13,10 +15,10 @@ Help needed!
 known issues: 
 -------------
 
-1. does not yet fetch stations from external sources
-2. preferences button do not read nor write values from/to gconf
-3. need static constants for preferences objects
-4. copyright info needs to state "derivative software" remark with originating source of "alex segler"
+1. preferences button do not read nor write values from/to gconf
+2. need static constants for preferences objects
+3. copyright info needs to state "derivative software" remark with originating source of "alex segler"
+
 
 Ubuntu 12.04 notes:
 -------------------

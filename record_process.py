@@ -121,7 +121,7 @@ class RecordProcess(threading.Thread,Gtk.VBox):
 		subprocess.call(["rhythmbox",filename])
 
 	def refillList(self):
-		self.songlist.set_model()
+		self.songlist.set_model(None)
 		self.songlist_store.clear()
 
 		path = os.path.join(self.outputpath,self.stream_name)

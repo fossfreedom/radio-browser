@@ -20,11 +20,13 @@ from gi.repository import GObject
 from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import GdkPixbuf
+from gi.repository import GLib
 import rb
 import httplib
 #import gconf
 import os
 import subprocess
+from threading import Thread
 import threading
 import hashlib
 import urllib
@@ -55,6 +57,8 @@ RB_METADATA_FIELD_BITRATE = 20
 BOARD_ROOT = "http://www.radio-browser.info/"
 RECENTLY_USED_FILENAME = "recently2.bin"
 BOOKMARKS_FILENAME = "bookmarks.bin"
+
+GLib.threads_init()
 
 class RadioBrowserSource(RB.StreamingSource):
 #    	__gproperties__ = {
@@ -340,7 +344,7 @@ class RadioBrowserSource(RB.StreamingSource):
 				new_model.append(source_parent,(entry.server_name,entry))
 
 		# set model of result_box
-		new_model.set_sort_column_id(0,Gtk.SORT_ASCENDING)
+		new_model.set_sort_column_id(0,Gtk.SortType.ASCENDING)
 		self.result_box.set_model(new_model)
 		Gdk.threads_leave()
 			

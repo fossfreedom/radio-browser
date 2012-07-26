@@ -174,14 +174,14 @@ class FeedBoard(Feed):
 		LanguageList = Gtk.ListStore(str)
 		for language in self.handler.languages:
 			LanguageList.append([language])
-		LanguageList.set_sort_column_id(0,Gtk.SORT_ASCENDING)
+		LanguageList.set_sort_column_id(0,Gtk.SortType.ASCENDING)
 		dialog.StationLanguage.set_model(LanguageList)
 		dialog.StationLanguage.set_text_column(0)
 
 		CountryList = Gtk.ListStore(str)
 		for country in self.handler.countries:
 			CountryList.append([country])
-		CountryList.set_sort_column_id(0,Gtk.SORT_ASCENDING)
+		CountryList.set_sort_column_id(0,Gtk.SortType.ASCENDING)
 		dialog.StationCountry.set_model(CountryList)
 		dialog.StationCountry.set_text_column(0)
 
