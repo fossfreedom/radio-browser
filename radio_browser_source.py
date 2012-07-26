@@ -20,6 +20,7 @@ from gi.repository import GObject
 from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import GdkPixbuf
+from gi.repository.GdkPixbuf import Pixbuf
 from gi.repository import GLib
 import rb
 import httplib
@@ -427,6 +428,10 @@ class RadioBrowserSource(RB.StreamingSource):
 		print "refill favourites"
 		
 		(hasfound, width, height) = Gtk.icon_size_lookup(Gtk.IconSize.BUTTON)
+		print "width"
+		print width
+		print height
+		print hasfound
 		
 		# remove all old information in infobox
 		for widget in self.start_box.get_children():
@@ -518,7 +523,7 @@ class RadioBrowserSource(RB.StreamingSource):
 						hash_src = hashlib.md5(station.icon_src).hexdigest()
 						filepath = os.path.join(self.icon_cache_dir, hash_src)
 						if os.path.exists(filepath):
-							buffer = Gdk.pixbuf_new_from_file_at_size(filepath,width,height)
+							buffer = Pixbuf.new_from_file_at_size(filepath,width,height)
 							img = Gtk.Image()
 							img.set_from_pixbuf(buffer)
 							img.show()
@@ -576,7 +581,7 @@ class RadioBrowserSource(RB.StreamingSource):
 					hash_src = hashlib.md5(station.icon_src).hexdigest()
 					filepath = os.path.join(self.icon_cache_dir, hash_src)
 					if os.path.exists(filepath):
-						buffer = Gdk.pixbuf_new_from_file_at_size(filepath,width,height)
+						buffer = Pixbuf.new_from_file_at_size(filepath,width,height)
 						img = Gtk.Image()
 						img.set_from_pixbuf(buffer)
 						img.show()
@@ -822,15 +827,18 @@ class RadioBrowserSource(RB.StreamingSource):
 	""" tries to load icon from disk and if found it saves it in cache returns it """
 	def get_icon_pixbuf(self,filepath,return_value_not_found=None):
 		if os.path.exists(filepath):
-			what, width, height = Gtk.icon_size_lookup(Gtk.IconSize.BUTTON)
+			icon = None
+
 			if filepath in self.icon_cache:
 				return self.icon_cache[filepath]
 			else:
 				try:
-					icon = Gdk.pixbuf_new_from_file_at_size(filepath,width,height)
+					what, width, height = Gtk.icon_size_lookup(Gtk.IconSize.BUTTON)
+					icon = Pixbuf.new_from_file_at_size(filepath,width,height)
 				except:
 					icon = return_value_not_found
 				self.icon_cache[filepath] = icon
+
 			return icon
 		return return_value_not_found
 
@@ -842,21 +850,23 @@ class RadioBrowserSource(RB.StreamingSource):
 		if infostr == "image":
 			icon = None
 			if isinstance(obj,RadioStation):
+				print "is an instance of radiostation"
 				station = obj
 				# default icon
 				icon = self.clef_icon
 
 				# icons for special feeds
-				print "station %s", station.type
+				print "station"
+				print station.type
 				if station.type == "Shoutcast":
 					icon = self.get_icon_pixbuf(rb.find_plugin_file(self.plugin, "shoutcast-logo.png"))
-					print "shoutcast"
+					print "type shoutcast"
 				if station.type == "Icecast":
 					icon = self.get_icon_pixbuf(rb.find_plugin_file(self.plugin, "xiph-logo.png"))
-					print "icecast"
+					print "type icecast"
 				if station.type == "Board":
 					icon = self.get_icon_pixbuf(rb.find_plugin_file(self.plugin, "local-logo.png"))
-					print "board"
+					print "type board"
 
 				# most special icons, if the station has one for itsself
 				if station.icon_src != "":
@@ -1185,7 +1195,7 @@ class RadioBrowserSource(RB.StreamingSource):
 	def load_icon_file(self,filepath,value_not_found):
 		icon = value_not_found
 		try:
-			icon = Gdk.pixbuf_new_from_file_at_size(filepath,72,72)
+			icon = Pixbuf.new_from_file_at_size(filepath,72,72)
 		except:
 			icon = value_not_found
 		return icon
