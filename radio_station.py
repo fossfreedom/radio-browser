@@ -1,6 +1,6 @@
 #    This file is part of Radio-Browser-Plugin for Rhythmbox.
-#
-#    Copyright (C) 2009 <segler_alex@web.de>
+#    Copyright (C) 2012 <foss.freedom@gmail.com>
+#    This is a derivative of software originally created by <segler_alex@web.de> 2009
 #
 #    Radio-Browser-Plugin is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ class RadioStation:
 				self.listen_url = self.listen_urls[0]
 				return
 
-			Gtk.gdk.threads_enter()
+			Gdk.threads_enter()
 			dialog = Gtk.Dialog(_("Select stream URL please"),flags=Gtk.DIALOG_MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,buttons=(Gtk.STOCK_OK,Gtk.RESPONSE_OK))
 
 			urlListView = Gtk.TreeView()
@@ -70,7 +70,7 @@ class RadioStation:
 			urlListView.set_model(urlListStore)
 
 			treeselection = urlListView.get_selection()
-			treeselection.set_mode(Gtk.SELECTION_SINGLE)
+			treeselection.set_mode(Gtk.SelectionType.SINGLE)
 			treeselection.select_iter(iter)
 
 			contentarea = dialog.get_content_area()
@@ -81,7 +81,7 @@ class RadioStation:
 
 			(model, iter) = treeselection.get_selected()
 			self.listen_url = model.get_value(iter,0)
-			Gtk.gdk.threads_leave()
+			Gdk.threads_leave()
 			print "choosen link:"+self.listen_url
 
 		except Exception,e:

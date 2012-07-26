@@ -18,8 +18,6 @@ known issues:
 1. radio station filter view does not display via icons and hangs on being filtered
 2. preferences button do not read nor write values from/to gconf
 3. need static constants for preferences objects
-4. copyright info needs to state "derivative software" remark with originating source of "alex segler"
-
 
 Ubuntu 12.04 notes:
 -------------------

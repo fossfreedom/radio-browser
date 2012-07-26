@@ -1,6 +1,6 @@
 #    This file is part of Radio-Browser-Plugin for Rhythmbox.
-#
-#    Copyright (C) 2009 <segler_alex@web.de>
+#    Copyright (C) 2012 <foss.freedom@gmail.com>
+#    This is a derivative of software originally created by <segler_alex@web.de> 2009
 #
 #    Radio-Browser-Plugin is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -122,8 +122,6 @@ class RadioBrowserSource(RB.StreamingSource):
 			
 			# create cache dir
 			self.cache_dir = RB.find_user_cache_file("radio-browser")
-			print "cache dir"
-			print self.cache_dir
 
 			if os.path.exists(self.cache_dir) is False:
 				os.makedirs(self.cache_dir, 0700)
@@ -156,8 +154,8 @@ class RadioBrowserSource(RB.StreamingSource):
 			
 			self.tree_store = Gtk.TreeStore(str,object)
 			self.sorted_list_store = Gtk.TreeModelSort(model=self.tree_store) #Gtk.TreeModelSort(self.tree_store) 
-			#self.filtered_list_store = self.sorted_list_store.filter_new()
-			#self.filtered_list_store.set_visible_func(self.list_store_visible_func)
+			self.filtered_list_store = self.sorted_list_store.filter_new()
+			self.filtered_list_store.set_visible_func(self.list_store_visible_func)
 			self.tree_view = Gtk.TreeView(self.sorted_list_store)
 
 			# create the view
@@ -428,7 +426,6 @@ class RadioBrowserSource(RB.StreamingSource):
 	def refill_favourites(self):
 		print "refill favourites"
 		
-		print Gtk.icon_size_lookup(Gtk.IconSize.BUTTON)
 		(hasfound, width, height) = Gtk.icon_size_lookup(Gtk.IconSize.BUTTON)
 		
 		# remove all old information in infobox
@@ -844,19 +841,22 @@ class RadioBrowserSource(RB.StreamingSource):
 
 		if infostr == "image":
 			icon = None
-
 			if isinstance(obj,RadioStation):
 				station = obj
 				# default icon
 				icon = self.clef_icon
 
 				# icons for special feeds
+				print "station %s", station.type
 				if station.type == "Shoutcast":
 					icon = self.get_icon_pixbuf(rb.find_plugin_file(self.plugin, "shoutcast-logo.png"))
+					print "shoutcast"
 				if station.type == "Icecast":
 					icon = self.get_icon_pixbuf(rb.find_plugin_file(self.plugin, "xiph-logo.png"))
+					print "icecast"
 				if station.type == "Board":
 					icon = self.get_icon_pixbuf(rb.find_plugin_file(self.plugin, "local-logo.png"))
+					print "board"
 
 				# most special icons, if the station has one for itsself
 				if station.icon_src != "":
@@ -864,14 +864,18 @@ class RadioBrowserSource(RB.StreamingSource):
 					filepath = os.path.join(self.icon_cache_dir, hash_src)
 					if os.path.exists(filepath):
 						icon = self.get_icon_pixbuf(filepath,icon)
+						print "special"
 					else:
 						# load icon
 						self.icon_download_queue.put([filepath,station.icon_src])
+						print "load"
 
 			if icon is None:
 				cell.set_property("stock-id",Gtk.STOCK_DIRECTORY)
+				print "stock"
 			else:
 				cell.set_property("pixbuf",icon)
+				print "pixbuf"
 
 	""" transmits station information to board """
 	def transmit_station(self,station):
@@ -1083,7 +1087,6 @@ class RadioBrowserSource(RB.StreamingSource):
 			self.notebook.set_current_page(self.notebook.page_num(self.recording_streams[uri]))
 		else:
 			# get player
-#			player = self.shell.get_player()
 			player = self.shell.props.shell_player
 			player.stop()
 
@@ -1091,7 +1094,6 @@ class RadioBrowserSource(RB.StreamingSource):
 			entry = self.db.entry_lookup_by_location(station.getRealURL())
 			if entry == None:
 				#self.shell.props.db.entry_delete(self.entry)
-				print "new"
 				entry = RB.RhythmDBEntry.new(self.db, self.entry_type, station.getRealURL())				
 #				self.entry = self.shell.props.db.entry_new(self.entry_type, station.getRealURL())
 				print station.getRealURL()
@@ -1099,7 +1101,6 @@ class RadioBrowserSource(RB.StreamingSource):
 #				server = station.server_name
 #				self.db.entry_set(entry,RB.RhythmDBPropType.TITLE, server)
 				self.db.entry_set(entry, RB.RhythmDBPropType.TITLE, station.getId())
-				print "commit"
 				self.db.commit()
 
 			#shell.load_uri(uri,False)

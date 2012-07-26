@@ -10,5 +10,5 @@ install:
 	install -d $(DESTDIR)$(SUBDIR)
 	install -m 644 *.py $(DESTDIR)$(SUBDIR)
 	install -m 644 *.png $(DESTDIR)$(SUBDIR)
-	install -m 644 radio-browser.rb-plugin $(DESTDIR)$(SUBDIR)
+	install -m 644 radio-browser.plugin $(DESTDIR)$(SUBDIR)
 	cd po;./lang.sh $(DESTDIR)$(LOCALEDIR)

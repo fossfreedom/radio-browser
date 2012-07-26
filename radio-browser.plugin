@@ -1,6 +1,6 @@
 #    This file is part of Radio-Browser-Plugin for Rhythmbox.
-#
-#    Copyright (C) 2009 <segler_alex@web.de>
+#    Copyright (C) 2012 <foss.freedom@gmail.com>
+#    This is a derivative of software originally created by <segler_alex@web.de> 2009
 #
 #    Radio-Browser-Plugin is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ Description[es]=Muestra estaciones de radio Icecast y Shoutcast
 Description[fr]=Montrer les webradios Icecast et Shoutcast dans un onglet
 Description[pt_BR]=Exibe estações de icecast e shoutcast em uma aba.
 Description[ru]=Показывать icecast и shoutcast радиостанции…
-Authors=Murauer Alexander <segler_alex@web.de>
-Copyright=Copyright © 2009 Murauer Alexander
-Website=http://programmierecke.net
+Authors=fossfreedom <foss.freedom@gmail.com>, Murauer Alexander <segler_alex@web.de>
+Copyright=Copyright © 2012 fossfreedom
+Website=https://github.com/fossfreedom/radio-browser
 Icon=radio-browser.png

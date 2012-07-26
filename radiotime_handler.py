@@ -1,6 +1,6 @@
 #    This file is part of Radio-Browser-Plugin for Rhythmbox.
-#
-#    Copyright (C) 2009 <segler_alex@web.de>
+#    Copyright (C) 2012 <foss.freedom@gmail.com>
+#    This is a derivative of software originally created by <segler_alex@web.de> 2009
 #
 #    Radio-Browser-Plugin is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
