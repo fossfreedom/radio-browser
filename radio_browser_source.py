@@ -265,7 +265,7 @@ class RadioBrowserSource(RB.StreamingSource):
 			self.notebook = Gtk.Notebook()
 			self.notebook.append_page(self.start_box,Gtk.Label(_("Favourites")))
 			self.notebook.append_page(self.search_box,Gtk.Label(_("Search")))
-#			self.notebook.append_page(stations_box,Gtk.Label(_("Radiostation list")))
+			self.notebook.append_page(stations_box,Gtk.Label(_("Radiostation list")))
 			self.notebook.set_scrollable(True)
 			self.notebook.connect("switch-page",self.event_page_switch)
 			
