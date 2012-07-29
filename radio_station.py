@@ -40,7 +40,12 @@ class RadioStation:
 		return self.listen_url
 
 	def getId(self):
-		return int(self.id.decode('utf-8'))
+		val = self.id.decode('utf-8')
+		if not val == '':
+			return int(self.id.decode('utf-8'))
+		else:
+			print "no id"
+			return 0
 
 	def updateRealURL(self):
 		pass
