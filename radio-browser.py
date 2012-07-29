@@ -48,46 +48,89 @@ class ConfigDialog (GObject.Object, PeasGtk.Configurable):
 		self.gconf = GConf.Client.get_default()
 
 	def do_create_configure_widget(self):
-#		self.plugin = self.props.plugin
+
+		#now define some defaults
+		self.download_trys = self.gconf.get_string(gconf_keys['download_trys'])
+		if not self.download_trys:
+			self.download_trys = "3"
+		self.gconf.set_string(gconf_keys['download_trys'], self.download_trys)
+
+		self.recently_played_purge_days = self.gconf.get_string(gconf_keys['recently_played_purge_days'])
+		if not self.recently_played_purge_days:
+			self.recently_played_purge_days = "3"
+		self.gconf.set_string(gconf_keys['recently_played_purge_days'], self.recently_played_purge_days)
+
+		# set the output path of recorded music to xdg standard directory for music
+		self.outputpath = self.gconf.get_string(gconf_keys['outputpath'])
+		if not self.outputpath:
+			self.outputpath = os.path.expanduser("~")
+			# try to read xdg music dir
+			try:
+				f = open(self.outputpath+"/.config/user-dirs.dirs","r")
+			except IOError:
+				print "xdg user dir file not found"
+			else:
+				for line in f:
+					if line.startswith("XDG_MUSIC_DIR"):
+						self.outputpath = os.path.expandvars(line.split("=")[1].strip().strip('"'))
+						print self.outputpath
+				f.close()
+		self.gconf.set_string(gconf_keys['outputpath'], self.outputpath)
+
+
+		# next define the GUI
 		builder = Gtk.Builder()
 		file = rb.find_plugin_file( self, DIALOG_FILE )
-		print file
 		builder.add_from_file( file  )
+
+		# ... and fill in values found and connect the methods
+
+
  		self.spin_download_trys = builder.get_object( 'spin_download_trys' )
 		self.spin_download_trys.set_adjustment(Gtk.Adjustment(value=1,lower=1,upper=10,step_incr=1))
-#		self.spin_download_trys.set_value(float(self.plugin.download_trys))
-#		self.spin_download_trys.connect("changed",self.download_trys_changed)
+		self.spin_download_trys.set_value(float(self.download_trys))
+		self.spin_download_trys.connect("changed",self.on_spin_download_trys_change_value)
  		self.spin_removaltime = builder.get_object( 'spin_removaltime' )
 		self.spin_removaltime.set_adjustment(Gtk.Adjustment(value=1,lower=1,upper=7,step_incr=1))
-#		self.spin_removaltime.set_value(float(self.plugin.recently_played_purge_days))
+		self.spin_removaltime.connect("changed",self.on_spin_removaltime_change_value)
+		self.spin_removaltime.set_value(float(self.recently_played_purge_days))
  		self.entry_outputpath = builder.get_object( 'entry_outputpath' )
-#		self.entry_outputpath.set_text(self.plugin.outputpath)
+		self.entry_outputpath.connect("changed",self.on_entry_outputpath_changed)
+		self.entry_outputpath.set_text(self.outputpath)
+		self.file_browser_button = builder.get_object( 'file_browser_button')
+		self.file_browser_button.connect("clicked",self.on_file_browser_button_clicked)
+
+
 		return builder.get_object( DIALOG )
 
 	def on_file_browser_button_clicked(self,button):
-		filew = Gtk.FileChooserDialog("File selection", action=Gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER, buttons=(Gtk.STOCK_CANCEL,
-                                          Gtk.RESPONSE_REJECT,
+		print "file browser button"
+		filew = Gtk.FileChooserDialog("File selection", action=Gtk.FileChooserAction.SELECT_FOLDER, buttons=(Gtk.STOCK_CANCEL,
+                                          Gtk.ResponseType.REJECT,
                                           Gtk.STOCK_OK,
-                                          Gtk.RESPONSE_OK))
-		filew.set_filename(self.plugin.outputpath)
-		if filew.run() == Gtk.RESPONSE_OK:
+                                          Gtk.ResponseType.OK))
+		filew.set_filename(self.outputpath)
+		if filew.run() == Gtk.ResponseType.OK:
 			self.entry_outputpath.set_text(filew.get_filename())
 		filew.destroy()
 
 	""" immediately change gconf values in config dialog after user changed download trys """
 	def on_spin_download_trys_change_value(self,spin):
-		self.plugin.download_trys = str(self.spin_download_trys.get_value())
-		self.gconf.set_string(gconf_keys['download_trys'], self.plugin.download_trys)
+		print "on spin change"
+		self.download_trys = str(self.spin_download_trys.get_value())
+		self.gconf.set_string(gconf_keys['download_trys'], self.download_trys)
 
 	""" immediately change gconf values in config dialog after user changed removal days """
 	def on_spin_removaltime_change_value(self,spin):
-		self.plugin.recently_played_purge_days = str(self.spin_removaltime.get_value())
-		self.gconf.set_string(gconf_keys['recently_played_purge_days'], self.plugin.recently_played_purge_days)
+		print "on removal time change"
+		self.recently_played_purge_days = str(self.spin_removaltime.get_value())
+		self.gconf.set_string(gconf_keys['recently_played_purge_days'], self.recently_played_purge_days)
 
 	""" immediately change gconf values in config dialog after user changed recorded music output directory """
 	def on_entry_outputpath_changed(self,entry):
-		self.plugin.outputpath = self.entry_outputpath.get_text()
-		self.gconf.set_string(gconf_keys['outputpath'], self.plugin.outputpath)
+		print "on outputpath change"
+		self.outputpath = self.entry_outputpath.get_text()
+		self.gconf.set_string(gconf_keys['outputpath'], self.outputpath)
 
 class RadioBrowserEntryType(RB.RhythmDBEntryType):
 	def __init__(self):
