@@ -4,9 +4,6 @@
   <object class="GtkBox" id="config_dialog">
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
-    <property name="title" translatable="yes">Radio Browser Configuration</property>
-    <property name="window_position">center</property>
-    <property name="type_hint">dialog</property>
     <child>
       <object class="GtkBox" id="dialog-vbox1">
         <property name="visible">True</property>
@@ -19,22 +16,6 @@
             <property name="layout_style">end</property>
             <child>
               <placeholder/>
-            </child>
-            <child>
-              <object class="GtkButton" id="dialog_close">
-                <property name="label">gtk-close</property>
-                <property name="use_action_appearance">False</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_action_appearance">False</property>
-                <property name="use_stock">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">1</property>
-              </packing>
             </child>
           </object>
           <packing>
