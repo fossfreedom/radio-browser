@@ -5,7 +5,7 @@ GTK3+ port from original source https://github.com/segler-alex/rhythmbox-radio-b
 for Rhythmbox 2.96
 
 Current situation as of:
-29 Jul 2012 - GUI mostly ported. The third search tab is not functional as yet. 
+21 Aug 2012 - GUI ported. The third search tab is functional but a little buggy. 
 It does play radio-stations from the default list and you can search for new radio stations
 
 Help needed! 
@@ -14,12 +14,10 @@ Help needed!
 known issues: 
 -------------
 
-1. radio station filter view does not display via icons and hangs on being filtered - currently no idea what the issue here is.
+1. radio station filter view is very slow when filtering.
 2. preferences button - functional but needs code cleanup (duplication of code and stop the need to restart rhythmbox before preferences are recognised)
+3. the station filter always seems to retrieve a new list on startup hence appears very slow - probably should really cache until the user actually says to download new stations.
 
-Potential Enhancements
-----------------------
-1. In the radio_browser_source code there are some toolbar methods which are never called - could be useful to define the toolbar buttons
 
 Ubuntu 12.04 notes:
 -------------------
