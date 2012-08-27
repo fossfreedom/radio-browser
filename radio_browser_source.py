@@ -223,12 +223,12 @@ class RadioBrowserSource(RB.StreamingSource):
 			filterbox.pack_start(self.filter_entry_genre,False,False,0)
 			filterbox.pack_start(Gtk.Label(_("Bitrate")+":"),False,False,0)
 			filterbox.pack_start(self.filter_entry_bitrate,False,False,0)
-			reseticoncachebutton = Gtk.Button(_("Cache"))
-			reseticoncachebutton.connect("clicked",self.clear_iconcache_button_clicked)
-			filterbox.pack_start(reseticoncachebutton,False,False,0)
-			updatecachebutton = Gtk.Button(_("Update"))
-			updatecachebutton.connect("clicked",self.update_button_clicked)
-			filterbox.pack_start(updatecachebutton,False,False,0)
+			#reseticoncachebutton = Gtk.Button(_("Cache"))
+			#reseticoncachebutton.connect("clicked",self.clear_iconcache_button_clicked)
+			#filterbox.pack_start(reseticoncachebutton,False,False,0)
+			#updatecachebutton = Gtk.Button(_("Update"))
+			#updatecachebutton.connect("clicked",self.update_button_clicked)
+			#filterbox.pack_start(updatecachebutton,False,False,0)
 
 			self.start_box = Gtk.HPaned()
 
