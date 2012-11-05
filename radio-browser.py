@@ -32,234 +32,234 @@ from gettext import *
 from radio_browser_source import RadioBrowserSource
 
 gconf_keys = {'download_trys' : '/apps/rhythmbox/plugins/radio-browser/download_trys',
-	'outputpath': '/apps/rhythmbox/plugins/radio-browser/streamripper_outputpath',
-	'recently_played_purge_days': '/apps/rhythmbox/plugins/radio-browser/recently_played_purge_days'
-	}
+    'outputpath': '/apps/rhythmbox/plugins/radio-browser/streamripper_outputpath',
+    'recently_played_purge_days': '/apps/rhythmbox/plugins/radio-browser/recently_played_purge_days'
+    }
 
 DIALOG_FILE = 'radio-browser.glade'
 DIALOG = 'config_dialog'
 
 class ConfigDialog (GObject.Object, PeasGtk.Configurable):
-	__type_name__ = 'RadioBrowserConfigDialog'
-	object = GObject.property(type=GObject.Object)
+    __type_name__ = 'RadioBrowserConfigDialog'
+    object = GObject.property(type=GObject.Object)
 
-	def __init__(self):
-		GObject.Object.__init__(self)
-		self.gconf = GConf.Client.get_default()
+    def __init__(self):
+        GObject.Object.__init__(self)
+        self.gconf = GConf.Client.get_default()
 
-	def do_create_configure_widget(self):
+    def do_create_configure_widget(self):
 
-		#now define some defaults
-		self.download_trys = self.gconf.get_string(gconf_keys['download_trys'])
-		if not self.download_trys:
-			self.download_trys = "3"
-		self.gconf.set_string(gconf_keys['download_trys'], self.download_trys)
+        #now define some defaults
+        self.download_trys = self.gconf.get_string(gconf_keys['download_trys'])
+        if not self.download_trys:
+            self.download_trys = "3"
+        self.gconf.set_string(gconf_keys['download_trys'], self.download_trys)
 
-		self.recently_played_purge_days = self.gconf.get_string(gconf_keys['recently_played_purge_days'])
-		if not self.recently_played_purge_days:
-			self.recently_played_purge_days = "3"
-		self.gconf.set_string(gconf_keys['recently_played_purge_days'], self.recently_played_purge_days)
+        self.recently_played_purge_days = self.gconf.get_string(gconf_keys['recently_played_purge_days'])
+        if not self.recently_played_purge_days:
+            self.recently_played_purge_days = "3"
+        self.gconf.set_string(gconf_keys['recently_played_purge_days'], self.recently_played_purge_days)
 
-		# set the output path of recorded music to xdg standard directory for music
-		self.outputpath = self.gconf.get_string(gconf_keys['outputpath'])
-		if not self.outputpath:
-			self.outputpath = os.path.expanduser("~")
-			# try to read xdg music dir
-			try:
-				f = open(self.outputpath+"/.config/user-dirs.dirs","r")
-			except IOError:
-				print "xdg user dir file not found"
-			else:
-				for line in f:
-					if line.startswith("XDG_MUSIC_DIR"):
-						self.outputpath = os.path.expandvars(line.split("=")[1].strip().strip('"'))
-						print self.outputpath
-				f.close()
-		self.gconf.set_string(gconf_keys['outputpath'], self.outputpath)
-
-
-		# next define the GUI
-		builder = Gtk.Builder()
-		file = rb.find_plugin_file( self, DIALOG_FILE )
-		builder.add_from_file( file  )
-
-		# ... and fill in values found and connect the methods
+        # set the output path of recorded music to xdg standard directory for music
+        self.outputpath = self.gconf.get_string(gconf_keys['outputpath'])
+        if not self.outputpath:
+            self.outputpath = os.path.expanduser("~")
+            # try to read xdg music dir
+            try:
+                f = open(self.outputpath+"/.config/user-dirs.dirs","r")
+            except IOError:
+                print "xdg user dir file not found"
+            else:
+                for line in f:
+                    if line.startswith("XDG_MUSIC_DIR"):
+                        self.outputpath = os.path.expandvars(line.split("=")[1].strip().strip('"'))
+                        print self.outputpath
+                f.close()
+        self.gconf.set_string(gconf_keys['outputpath'], self.outputpath)
 
 
- 		self.spin_download_trys = builder.get_object( 'spin_download_trys' )
-		self.spin_download_trys.set_adjustment(Gtk.Adjustment(value=1,lower=1,upper=10,step_incr=1))
-		self.spin_download_trys.set_value(float(self.download_trys))
-		self.spin_download_trys.connect("changed",self.on_spin_download_trys_change_value)
- 		self.spin_removaltime = builder.get_object( 'spin_removaltime' )
-		self.spin_removaltime.set_adjustment(Gtk.Adjustment(value=1,lower=1,upper=7,step_incr=1))
-		self.spin_removaltime.connect("changed",self.on_spin_removaltime_change_value)
-		self.spin_removaltime.set_value(float(self.recently_played_purge_days))
- 		self.entry_outputpath = builder.get_object( 'entry_outputpath' )
-		self.entry_outputpath.connect("changed",self.on_entry_outputpath_changed)
-		self.entry_outputpath.set_text(self.outputpath)
-		self.file_browser_button = builder.get_object( 'file_browser_button')
-		self.file_browser_button.connect("clicked",self.on_file_browser_button_clicked)
+        # next define the GUI
+        builder = Gtk.Builder()
+        file = rb.find_plugin_file( self, DIALOG_FILE )
+        builder.add_from_file( file  )
+
+        # ... and fill in values found and connect the methods
 
 
-		return builder.get_object( DIALOG )
+        self.spin_download_trys = builder.get_object( 'spin_download_trys' )
+        self.spin_download_trys.set_adjustment(Gtk.Adjustment(value=1,lower=1,upper=10,step_incr=1))
+        self.spin_download_trys.set_value(float(self.download_trys))
+        self.spin_download_trys.connect("changed",self.on_spin_download_trys_change_value)
+        self.spin_removaltime = builder.get_object( 'spin_removaltime' )
+        self.spin_removaltime.set_adjustment(Gtk.Adjustment(value=1,lower=1,upper=7,step_incr=1))
+        self.spin_removaltime.connect("changed",self.on_spin_removaltime_change_value)
+        self.spin_removaltime.set_value(float(self.recently_played_purge_days))
+        self.entry_outputpath = builder.get_object( 'entry_outputpath' )
+        self.entry_outputpath.connect("changed",self.on_entry_outputpath_changed)
+        self.entry_outputpath.set_text(self.outputpath)
+        self.file_browser_button = builder.get_object( 'file_browser_button')
+        self.file_browser_button.connect("clicked",self.on_file_browser_button_clicked)
 
-	def on_file_browser_button_clicked(self,button):
-		print "file browser button"
-		filew = Gtk.FileChooserDialog("File selection", action=Gtk.FileChooserAction.SELECT_FOLDER, buttons=(Gtk.STOCK_CANCEL,
+
+        return builder.get_object( DIALOG )
+
+    def on_file_browser_button_clicked(self,button):
+        print "file browser button"
+        filew = Gtk.FileChooserDialog("File selection", action=Gtk.FileChooserAction.SELECT_FOLDER, buttons=(Gtk.STOCK_CANCEL,
                                           Gtk.ResponseType.REJECT,
                                           Gtk.STOCK_OK,
                                           Gtk.ResponseType.OK))
-		filew.set_filename(self.outputpath)
-		if filew.run() == Gtk.ResponseType.OK:
-			self.entry_outputpath.set_text(filew.get_filename())
-		filew.destroy()
+        filew.set_filename(self.outputpath)
+        if filew.run() == Gtk.ResponseType.OK:
+            self.entry_outputpath.set_text(filew.get_filename())
+        filew.destroy()
 
-	""" immediately change gconf values in config dialog after user changed download trys """
-	def on_spin_download_trys_change_value(self,spin):
-		print "on spin change"
-		self.download_trys = str(self.spin_download_trys.get_value())
-		self.gconf.set_string(gconf_keys['download_trys'], self.download_trys)
+    """ immediately change gconf values in config dialog after user changed download trys """
+    def on_spin_download_trys_change_value(self,spin):
+        print "on spin change"
+        self.download_trys = str(self.spin_download_trys.get_value())
+        self.gconf.set_string(gconf_keys['download_trys'], self.download_trys)
 
-	""" immediately change gconf values in config dialog after user changed removal days """
-	def on_spin_removaltime_change_value(self,spin):
-		print "on removal time change"
-		self.recently_played_purge_days = str(self.spin_removaltime.get_value())
-		self.gconf.set_string(gconf_keys['recently_played_purge_days'], self.recently_played_purge_days)
+    """ immediately change gconf values in config dialog after user changed removal days """
+    def on_spin_removaltime_change_value(self,spin):
+        print "on removal time change"
+        self.recently_played_purge_days = str(self.spin_removaltime.get_value())
+        self.gconf.set_string(gconf_keys['recently_played_purge_days'], self.recently_played_purge_days)
 
-	""" immediately change gconf values in config dialog after user changed recorded music output directory """
-	def on_entry_outputpath_changed(self,entry):
-		print "on outputpath change"
-		self.outputpath = self.entry_outputpath.get_text()
-		self.gconf.set_string(gconf_keys['outputpath'], self.outputpath)
+    """ immediately change gconf values in config dialog after user changed recorded music output directory """
+    def on_entry_outputpath_changed(self,entry):
+        print "on outputpath change"
+        self.outputpath = self.entry_outputpath.get_text()
+        self.gconf.set_string(gconf_keys['outputpath'], self.outputpath)
 
 class RadioBrowserEntryType(RB.RhythmDBEntryType):
-	def __init__(self):
-		RB.RhythmDBEntryType.__init__(self, name='RadioBrowserEntryType')
+    def __init__(self):
+        RB.RhythmDBEntryType.__init__(self, name='RadioBrowserEntryType')
 
 class RadioBrowserPlugin (GObject.GObject, Peas.Activatable):
-    	__gtype_name__ = 'RadioBrowserPlugin'
-    	object = GObject.Property(type=GObject.GObject)
+    __gtype_name__ = 'RadioBrowserPlugin'
+    object = GObject.Property(type=GObject.GObject)
 
-	def __init__(self):
-	        super(RadioBrowserPlugin, self).__init__()
-		self.gconf = GConf.Client.get_default()
+    def __init__(self):
+        super(RadioBrowserPlugin, self).__init__()
+        self.gconf = GConf.Client.get_default()
 
-	def action_update_list(self):
-		try:
-			self.shell.get_property("selected-source").update_button_clicked()
-		except:
-			# 0.13.3
-			self.shell.get_property("selected-page").update_button_clicked()
+    def action_update_list(self):
+        try:
+            self.shell.get_property("selected-source").update_button_clicked()
+        except:
+            # 0.13.3
+            self.shell.get_property("selected-page").update_button_clicked()
 
-	def action_remove_images(self):
-		try:
-			self.shell.get_property("selected-source").clear_iconcache_button_clicked()
-		except:
-			# 0.13.3
-			self.shell.get_property("selected-page").clear_iconcache_button_clicked()
+    def action_remove_images(self):
+        try:
+            self.shell.get_property("selected-source").clear_iconcache_button_clicked()
+        except:
+            # 0.13.3
+            self.shell.get_property("selected-page").clear_iconcache_button_clicked()
 
-	""" on plugin activation """
-	def do_activate(self):
+    """ on plugin activation """
+    def do_activate(self):
 
-		# Get the translation file
-		install('radio-browser')
+        # Get the translation file
+        install('radio-browser')
 
-		self.shell = self.object
-		# register this source in rhythmbox
-		db = self.shell.props.db
-		try:
-			entry_type = RadioBrowserEntryType()
-			db.register_entry_type(entry_type)
-		except NotImplementedError:
-			entry_type = db.entry_register_type("RadioBrowserEntryType")
+        self.shell = self.object
+        # register this source in rhythmbox
+        db = self.shell.props.db
+        try:
+            entry_type = RadioBrowserEntryType()
+            db.register_entry_type(entry_type)
+        except NotImplementedError:
+            entry_type = db.entry_register_type("RadioBrowserEntryType")
 
-		entry_type.category = RB.RhythmDBEntryCategory.STREAM
+        entry_type.category = RB.RhythmDBEntryCategory.STREAM
 
-		# load plugin icon
-		theme = Gtk.IconTheme.get_default()
-		rb.append_plugin_source_path(theme, "/icons")
+        # load plugin icon
+        theme = Gtk.IconTheme.get_default()
+        rb.append_plugin_source_path(theme, "/icons")
 
-		what, width, height = Gtk.icon_size_lookup(Gtk.IconSize.LARGE_TOOLBAR)
-		pxbf = GdkPixbuf.Pixbuf.new_from_file_at_size(rb.find_plugin_file(self, "radio-browser.png"), width, height)
+        what, width, height = Gtk.icon_size_lookup(Gtk.IconSize.LARGE_TOOLBAR)
+        pxbf = GdkPixbuf.Pixbuf.new_from_file_at_size(rb.find_plugin_file(self, "radio-browser.png"), width, height)
 
-		group = RB.DisplayPageGroup.get_by_id ("library")
+        group = RB.DisplayPageGroup.get_by_id ("library")
 
-		self.source = GObject.new (RadioBrowserSource, 
-					   shell=self.shell, 
-					   name=_("Radio browser"), 
-					   entry_type=entry_type,
-					   plugin=self,
-					   pixbuf=pxbf)
+        self.source = GObject.new (RadioBrowserSource, 
+                       shell=self.shell, 
+                       name=_("Radio browser"), 
+                       entry_type=entry_type,
+                       plugin=self,
+                       pixbuf=pxbf)
 
-		self.shell.register_entry_type_for_source(self.source, entry_type)
-		self.shell.append_display_page(self.source, group)
+        self.shell.register_entry_type_for_source(self.source, entry_type)
+        self.shell.append_display_page(self.source, group)
 
-#		GObject.type_register(RadioBrowserSource)
+#       GObject.type_register(RadioBrowserSource)
 
 
 
-		self.actiongroup = Gtk.ActionGroup('RadioBrowserActionGroup')
+        self.actiongroup = Gtk.ActionGroup('RadioBrowserActionGroup')
 
-		# add "update-all" action to the toolbar
-		action = Gtk.Action('UpdateList', None, _("Update radio station list"), Gtk.STOCK_GO_DOWN)
-		action.connect('activate', lambda a: action_update_list())
-		self.actiongroup.add_action(action)
+        # add "update-all" action to the toolbar
+        action = Gtk.Action('UpdateList', None, _("Update radio station list"), Gtk.STOCK_GO_DOWN)
+        action.connect('activate', lambda a: action_update_list())
+        self.actiongroup.add_action(action)
 
-		action = Gtk.Action('ClearIconCache', None, _("Clear icon cache"), Gtk.STOCK_CLEAR)
-		action.connect('activate', lambda a: action_remove_images())
-		self.actiongroup.add_action(action)
+        action = Gtk.Action('ClearIconCache', None, _("Clear icon cache"), Gtk.STOCK_CLEAR)
+        action.connect('activate', lambda a: action_remove_images())
+        self.actiongroup.add_action(action)
 
-		uim = self.shell.props.ui_manager
-		uim.insert_action_group (self.actiongroup)
-		uim.ensure_update()
+        uim = self.shell.props.ui_manager
+        uim.insert_action_group (self.actiongroup)
+        uim.ensure_update()
 
-		# try reading gconf entries and set default values if not readable
-		self.download_trys = self.gconf.get_string(gconf_keys['download_trys'])
-#		self.download_trys = None
-		if not self.download_trys:
-			self.download_trys = "3"
-		self.gconf.set_string(gconf_keys['download_trys'], self.download_trys)
+        # try reading gconf entries and set default values if not readable
+        self.download_trys = self.gconf.get_string(gconf_keys['download_trys'])
+#       self.download_trys = None
+        if not self.download_trys:
+            self.download_trys = "3"
+        self.gconf.set_string(gconf_keys['download_trys'], self.download_trys)
 
-		self.recently_played_purge_days = self.gconf.get_string(gconf_keys['recently_played_purge_days'])
-#		self.recently_played_purge_days = None
-		if not self.recently_played_purge_days:
-			self.recently_played_purge_days = "3"
-		self.gconf.set_string(gconf_keys['recently_played_purge_days'], self.recently_played_purge_days)
+        self.recently_played_purge_days = self.gconf.get_string(gconf_keys['recently_played_purge_days'])
+#       self.recently_played_purge_days = None
+        if not self.recently_played_purge_days:
+            self.recently_played_purge_days = "3"
+        self.gconf.set_string(gconf_keys['recently_played_purge_days'], self.recently_played_purge_days)
 
-		# set the output path of recorded music to xdg standard directory for music
-		self.outputpath = self.gconf.get_string(gconf_keys['outputpath'])
-#		self.outputpath = None
-		if not self.outputpath:
-			self.outputpath = os.path.expanduser("~")
-			# try to read xdg music dir
-			try:
-				f = open(self.outputpath+"/.config/user-dirs.dirs","r")
-			except IOError:
-				print "xdg user dir file not found"
-			else:
-				for line in f:
-					if line.startswith("XDG_MUSIC_DIR"):
-						self.outputpath = os.path.expandvars(line.split("=")[1].strip().strip('"'))
-						print self.outputpath
-				f.close()
-		self.gconf.set_string(gconf_keys['outputpath'], self.outputpath)
+        # set the output path of recorded music to xdg standard directory for music
+        self.outputpath = self.gconf.get_string(gconf_keys['outputpath'])
+#       self.outputpath = None
+        if not self.outputpath:
+            self.outputpath = os.path.expanduser("~")
+            # try to read xdg music dir
+            try:
+                f = open(self.outputpath+"/.config/user-dirs.dirs","r")
+            except IOError:
+                print "xdg user dir file not found"
+            else:
+                for line in f:
+                    if line.startswith("XDG_MUSIC_DIR"):
+                        self.outputpath = os.path.expandvars(line.split("=")[1].strip().strip('"'))
+                        print self.outputpath
+                f.close()
+        self.gconf.set_string(gconf_keys['outputpath'], self.outputpath)
 
-	""" build plugin configuration dialog """
-	def create_configure_dialog(self, dialog=None):
-		if not dialog:
-			dialog = ConfigDialog(self)
-			dialog.connect("response",self.dialog_response)
+    """ build plugin configuration dialog """
+    def create_configure_dialog(self, dialog=None):
+        if not dialog:
+            dialog = ConfigDialog(self)
+            dialog.connect("response",self.dialog_response)
 
-		dialog.present()
-		return dialog
+        dialog.present()
+        return dialog
 
-	def dialog_response(self,dialog,response):
-		dialog.hide()
+    def dialog_response(self,dialog,response):
+        dialog.hide()
 
-	""" on plugin deactivation """
-	def do_deactivate(self):
-		uim = self.shell.props.ui_manager
-		uim.remove_action_group(self.actiongroup)
-		self.actiongroup = None
-		self.source.delete_thyself()
-		self.source = None
+    """ on plugin deactivation """
+    def do_deactivate(self):
+        uim = self.shell.props.ui_manager
+        uim.remove_action_group(self.actiongroup)
+        self.actiongroup = None
+        self.source.delete_thyself()
+        self.source = None

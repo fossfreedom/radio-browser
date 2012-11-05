@@ -18,76 +18,76 @@
 from gi.repository import Gtk
 
 class RadioStation:
-	def __init__(self):
-		self.listen_url = ""
-		self.listen_urls = []
-		self.server_name = ""
-		self.genre = ""
-		self.bitrate = ""
-		self.current_song = ""
-		self.type = ""
-		self.icon_src = ""
-		self.homepage = ""
-		self.listeners = ""
-		self.server_type = ""
-		self.language = ""
-		self.country = ""
-		self.votes = ""
-		self.negativevotes = ""
-		self.id = ""
+    def __init__(self):
+        self.listen_url = ""
+        self.listen_urls = []
+        self.server_name = ""
+        self.genre = ""
+        self.bitrate = ""
+        self.current_song = ""
+        self.type = ""
+        self.icon_src = ""
+        self.homepage = ""
+        self.listeners = ""
+        self.server_type = ""
+        self.language = ""
+        self.country = ""
+        self.votes = ""
+        self.negativevotes = ""
+        self.id = ""
 
-	def getRealURL(self):
-		return self.listen_url
+    def getRealURL(self):
+        return self.listen_url
 
-	def getId(self):
-		val = self.id.decode('utf-8')
-		if not val == '':
-			return int(self.id.decode('utf-8'))
-		else:
-			print "no id"
-			return 0
+    def getId(self):
+        val = self.id.decode('utf-8')
+        if not val == '':
+            return int(self.id.decode('utf-8'))
+        else:
+            print "no id"
+            return 0
 
-	def updateRealURL(self):
-		pass
+    def updateRealURL(self):
+        pass
 
-	def askUserAboutUrls(self):
-		try:
-			if len(self.listen_urls) == 0:
-				self.listen_url = ""
-				return
-			if len(self.listen_urls) == 1:
-				self.listen_url = self.listen_urls[0]
-				return
+    def askUserAboutUrls(self):
+        try:
+            if len(self.listen_urls) == 0:
+                self.listen_url = ""
+                return
+            if len(self.listen_urls) == 1:
+                self.listen_url = self.listen_urls[0]
+                return
 
-			Gdk.threads_enter()
-			dialog = Gtk.Dialog(_("Select stream URL please"),flags=Gtk.DIALOG_MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,buttons=(Gtk.STOCK_OK,Gtk.RESPONSE_OK))
+            Gdk.threads_enter()
+            dialog = Gtk.Dialog(_("Select stream URL please"),flags=Gtk.DIALOG_MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,buttons=(Gtk.STOCK_OK,Gtk.RESPONSE_OK))
 
-			urlListView = Gtk.TreeView()
-			urlListView.append_column(Gtk.TreeViewColumn(_("Url"),Gtk.CellRendererText(),text=0))
-			urlListStore = Gtk.ListStore(str)
-			iter = None
-			for url in self.listen_urls:
-				newiter = urlListStore.append((url,))
-				if iter == None:
-					iter = newiter
-				if url.lower().startswith("http://") and not url.lower().endswith("asx"):
-					iter = newiter
-			urlListView.set_model(urlListStore)
+            urlListView = Gtk.TreeView()
+            urlListView.append_column(Gtk.TreeViewColumn(_("Url"),Gtk.CellRendererText(),text=0))
+            urlListStore = Gtk.ListStore(str)
+            iter = None
+            for url in self.listen_urls:
+                newiter = urlListStore.append((url,))
+                if iter == None:
+                    iter = newiter
+                if url.lower().startswith("http://") and not url.lower().endswith("asx"):
+                    iter = newiter
+            urlListView.set_model(urlListStore)
 
-			treeselection = urlListView.get_selection()
-			treeselection.set_mode(Gtk.SelectionType.SINGLE)
-			treeselection.select_iter(iter)
+            treeselection = urlListView.get_selection()
+            treeselection.set_mode(Gtk.SelectionType.SINGLE)
+            treeselection.select_iter(iter)
 
-			contentarea = dialog.get_content_area()
-			contentarea.pack_start(urlListView)
-			contentarea.show_all()
-			dialog.run()
-			dialog.hide_all()
+            contentarea = dialog.get_content_area()
+            contentarea.pack_start(urlListView)
+            contentarea.show_all()
+            dialog.run()
+            dialog.hide_all()
 
-			(model, iter) = treeselection.get_selected()
-			self.listen_url = model.get_value(iter,0)
-			Gdk.threads_leave()
-			print "choosen link:"+self.listen_url
+            (model, iter) = treeselection.get_selected()
+            self.listen_url = model.get_value(iter,0)
+            Gdk.threads_leave()
+            print "choosen link:"+self.listen_url
 
-		except Exception,e:
-			print e
+        except Exception,e:
+            print e
