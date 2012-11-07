@@ -1,5 +1,6 @@
 DESTDIR=
 SUBDIR=/usr/lib/rhythmbox/plugins/radio-browser/
+DATADIR=/usr/share/rhythmbox/plugins/radio-browser/
 LOCALEDIR=/usr/share/locale/
 
 all:
@@ -8,7 +9,8 @@ clean:
 
 install:
 	install -d $(DESTDIR)$(SUBDIR)
+	install -d $(DESTDIR)$(DATADIR)
 	install -m 644 *.py $(DESTDIR)$(SUBDIR)
 	install -m 644 *.png $(DESTDIR)$(SUBDIR)
+	install -m 644 *.ui $(DESTDIR)$(DATADIR)
 	install -m 644 radio-browser.plugin $(DESTDIR)$(SUBDIR)
-	cd po;./lang.sh $(DESTDIR)$(LOCALEDIR)
