@@ -158,7 +158,7 @@ class Feed:
             if self.UpdateChecking:
                 self.update()
             if not os.path.isfile(self.filename):
-                download()
+                self.download() #was just download()
             self.load()
             self.loaded = True
 
@@ -179,7 +179,7 @@ class Feed:
             if self.UpdateChecking:
                 self.update()
             if not os.path.isfile(self.filename):
-                download()
+                self.download() #was just download()
             self.load()
             self.loaded = True
 

@@ -24,7 +24,6 @@ from gi.repository.GdkPixbuf import Pixbuf
 from gi.repository import GLib
 import rb
 import httplib
-#import gconf
 import os
 import subprocess
 from threading import Thread
@@ -62,11 +61,6 @@ BOOKMARKS_FILENAME = "bookmarks.bin"
 GLib.threads_init()
 
 class RadioBrowserSource(RB.StreamingSource):
-#       __gproperties__ = {
-#         'plugin': (GObject.GObject, 'plugin', 'plugin',
-#                   GObject.PARAM_WRITABLE | GObject.PARAM_CONSTRUCT_ONLY),
-#         }
-
     def __init__(self):
         self.hasActivated = False
         RB.StreamingSource.__init__(self,name="RadioBrowserPlugin")
@@ -77,12 +71,15 @@ class RadioBrowserSource(RB.StreamingSource):
 
     """ return list of actions that should be displayed in toolbar """
     def do_get_ui_actions(self):
+        print "do_get_ui_actions"
         return self.do_impl_get_ui_actions()
 
     def do_impl_get_ui_actions(self):
+        print "do_impl_get_ui_actions"
         return ["UpdateList","ClearIconCache"]
 
     def do_impl_get_status(self):
+        print "do_impl_get_status"
         if self.updating:
             progress = -1.0
             if self.load_total_size > 0:
@@ -92,6 +89,7 @@ class RadioBrowserSource(RB.StreamingSource):
             return (_("Nothing to do"),None,2.0)
 
     def update_download_status(self,filename,current, total):
+        #print "update_download_status"
         self.load_current_size = current
         self.load_total_size = total
         self.load_status = _("Loading %(url)s") % {'url':filename}
@@ -101,10 +99,12 @@ class RadioBrowserSource(RB.StreamingSource):
         Gdk.threads_leave()
 
     def do_selected(self):
+        print "do_selected"
         self.do_impl_activate()
 
     """ on source actiavation, e.g. double click on source or playing something in this source """
     def do_impl_activate(self):
+        print "do_impl_activate"
         # first time of activation -> add graphical stuff
         if not self.hasActivated:
             self.plugin = self.props.plugin
@@ -115,10 +115,6 @@ class RadioBrowserSource(RB.StreamingSource):
             
             # add listener for stream infos
             sp = self.shell.props.shell_player
-            #sp.connect ('playing-song-changed',self.playing_entry_changed)
-            #sp.connect ('playing-changed',self.playing_changed)
-            #sp.connect ('playing-song-property-changed',self.playing_song_property_changed)
-
             sp.props.player.connect("info",self.info_available) 
             
             # create cache dir
@@ -135,29 +131,25 @@ class RadioBrowserSource(RB.StreamingSource):
             self.load_status = ""
             
             # create the model for the view
-            self.filter_entry = Gtk.Entry()
-            self.filter_entry.connect("changed",self.filter_entry_changed)
-            self.filter_entry_bitrate = Gtk.SpinButton()
-            self.filter_entry_bitrate.set_range(32,512)
-            self.filter_entry_bitrate.set_value(64)
-            self.filter_entry_bitrate.set_increments(32,32)
-            self.filter_entry_bitrate.connect("changed",self.filter_entry_changed)
 
-            self.filter_entry_genre = Gtk.Entry()
-            #cell = Gtk.CellRendererText()
-            #self.filter_entry_genre.pack_start(cell, True)
-            #self.filter_entry_genre.add_attribute(cell, 'text', 0)
-            
-            self.filter_entry_genre.connect("changed",self.filter_entry_changed)
+            ui = Gtk.Builder()
+            ui.add_from_file(rb.find_plugin_file(self.plugin,
+                'radio_station.ui'))
+
+            self.filter_entry = ui.get_object('filter_entry')    
+            self.filter_entry_bitrate = ui.get_object('filter_entry_bitrate')
+            self.filter_entry_genre = ui.get_object('filter_entry_genre')
     
             self.tree_store = Gtk.TreeStore(str,object)
-            self.sorted_list_store = Gtk.TreeModelSort(model=self.tree_store) #Gtk.TreeModelSort(self.tree_store) 
+            
+            self.sorted_list_store = Gtk.TreeModelSort(model=self.tree_store) #Gtk.TreeModelSort(self.tree_store)
             self.filtered_list_store = self.sorted_list_store.filter_new()
             self.filtered_list_store.set_visible_func(self.list_store_visible_func)
             self.filtered_icon_view_store = None
 
-            self.tree_view = Gtk.TreeView(self.sorted_list_store)
-
+            #self.tree_view = Gtk.TreeView(self.sorted_list_store)
+            self.tree_view = ui.get_object('tree_view')
+            self.tree_view.set_model(self.sorted_list_store)
             # create the view
             column_title = Gtk.TreeViewColumn()#"Title",Gtk.CellRendererText(),text=0)
             column_title.set_title(_("Title"))
@@ -173,107 +165,42 @@ class RadioBrowserSource(RB.StreamingSource):
             column_title.set_expand(True)
             self.tree_view.append_column(column_title)
 
-            """column_genre = Gtk.TreeViewColumn("Tags",Gtk.CellRendererText(),text=1)
-            column_genre.set_resizable(True)
-            column_genre.set_sizing(Gtk.TREE_VIEW_COLUMN_FIXED)
-            column_genre.set_fixed_width(100)
-            self.tree_view.append_column(column_genre)
-
-            column_bitrate = Gtk.TreeViewColumn("Bitrate",Gtk.CellRendererText(),text=2)
-            column_bitrate.set_resizable(True)
-            column_bitrate.set_sizing(Gtk.TREE_VIEW_COLUMN_FIXED)
-            column_bitrate.set_fixed_width(100)
-            self.tree_view.append_column(column_bitrate)"""
-
-            self.info_box_tree = Gtk.HBox()
-
-            # add some more listeners for tree view...
-            # - row double click
-            self.tree_view.connect("row-activated",self.row_activated_handler)
+            self.info_box_tree = ui.get_object('info_box_tree')
             # - selection change
             self.tree_view.connect("cursor-changed", self.treeview_cursor_changed_handler, self.info_box_tree)
 
             # create icon view
-            self.icon_view = Gtk.IconView()
+            self.icon_view = ui.get_object('icon_view')
             self.icon_view.set_text_column(0)
             self.icon_view.set_pixbuf_column(2)
-            self.icon_view.set_item_width(150)
-            self.icon_view.set_selection_mode(Gtk.SelectionMode.SINGLE)
-            self.icon_view.connect("item-activated", self.on_item_activated_icon_view)
-            self.icon_view.connect("selection-changed", self.on_selection_changed_icon_view)
-
-            self.tree_view_container = Gtk.ScrolledWindow()
-            self.tree_view_container.set_shadow_type(Gtk.ShadowType.IN)
-            self.tree_view_container.add(self.tree_view)
-            self.tree_view_container.set_property("hscrollbar-policy", Gtk.PolicyType.AUTOMATIC)
-
-            self.icon_view_container = Gtk.ScrolledWindow()
-            self.icon_view_container.set_shadow_type(Gtk.ShadowType.IN)
-            self.icon_view_container.add(self.icon_view)
-            self.icon_view_container.set_property("hscrollbar-policy", Gtk.PolicyType.AUTOMATIC)
-
-            self.view = Gtk.HBox()
-            self.view.pack_start(self.tree_view_container,True,True,0) #dm
-            self.view.pack_start(self.icon_view_container,True,True,0) #dm
-
-            filterbox = Gtk.HBox()
-            filterbox.pack_start(Gtk.Label(_("Filter")+":"),False,False,0)
-            filterbox.pack_start(self.filter_entry,True,True,0) #dm
-            filterbox.pack_start(Gtk.Label(_("Genre")+":"),False,False,0)
-            filterbox.pack_start(self.filter_entry_genre,False,False,0)
-            filterbox.pack_start(Gtk.Label(_("Bitrate")+":"),False,False,0)
-            filterbox.pack_start(self.filter_entry_bitrate,False,False,0)
-            #reseticoncachebutton = Gtk.Button(_("Cache"))
-            #reseticoncachebutton.connect("clicked",self.clear_iconcache_button_clicked)
-            #filterbox.pack_start(reseticoncachebutton,False,False,0)
-            #updatecachebutton = Gtk.Button(_("Update"))
-            #updatecachebutton.connect("clicked",self.update_button_clicked)
-            #filterbox.pack_start(updatecachebutton,False,False,0)
-
-            self.start_box = Gtk.HPaned()
+            self.tree_view_container = ui.get_object('tree_view_container')
+            self.icon_view_container = ui.get_object('icon_view_container')
+            self.view = ui.get_object('view')
+            filterbox = ui.get_object('filterbox')
+            self.start_box = ui.get_object('start_box')
 
             # prepare search tab
             print "prepare search tab"
-            self.info_box_search = Gtk.HBox()
-            self.search_box = Gtk.VBox()
-            self.search_entry = Gtk.Entry()
-            #self.search_entry.connect("changed",self.filter_entry_changed)
+            self.info_box_search = ui.get_object('info_box_search')
+            self.search_box = ui.get_object('search_box')
+            self.search_entry = ui.get_object('search_entry')
 
             def searchButtonClick(widget):
                 self.doSearch(self.search_entry.get_text())
 
-            searchbutton = Gtk.Button(_("Search"))
+            searchbutton = ui.get_object('searchbutton')
             searchbutton.connect("clicked",searchButtonClick)
 
-            search_input_box = Gtk.HBox()
-            search_input_box.pack_start(self.search_entry,True,True,0)
-            search_input_box.pack_start(searchbutton,False,False,0)
-
-            self.result_box = Gtk.TreeView()
-            self.result_box.connect("row-activated",self.row_activated_handler)
+            search_input_box = ui.get_object('search_input_box')
+            self.result_box = ui.get_object('result_box')
             self.result_box.connect("cursor-changed", self.treeview_cursor_changed_handler,self.info_box_search)
 
-            self.result_box_container = Gtk.ScrolledWindow()
-            self.result_box_container.set_shadow_type(Gtk.ShadowType.IN)
-            self.result_box_container.add(self.result_box)
-            self.result_box_container.set_property("hscrollbar-policy", Gtk.PolicyType.AUTOMATIC)
+            self.result_box_container = ui.get_object('result_box_container')
             self.result_box.append_column(Gtk.TreeViewColumn(_("Title"),Gtk.CellRendererText(),text=0))
 
-            self.search_box.pack_start(search_input_box,False,False,0)
-            self.search_box.pack_start(self.result_box_container,True,True,0)
-            self.search_box.pack_start(self.info_box_search,False,False,0)
-
-            stations_box = Gtk.VBox()
-            stations_box.pack_start(filterbox,False,False,0)
-            stations_box.pack_start(self.view,True,True,0) #dm
-            stations_box.pack_start(self.info_box_tree,False,False,0)
-
-            self.notebook = Gtk.Notebook()
-            self.notebook.append_page(self.start_box,Gtk.Label(_("Favourites")))
-            self.notebook.append_page(self.search_box,Gtk.Label(_("Search")))
-            self.notebook.append_page(stations_box,Gtk.Label(_("Radiostation list")))
-            self.notebook.set_scrollable(True)
-            self.notebook.connect("switch-page",self.event_page_switch)
+            stations_box = ui.get_object('stations_box')
+            self.notebook = ui.get_object('notebook')
+            ui.connect_signals(self)
             
             self.pack_start(self.notebook,True, True, 0)
             self.notebook.show_all()
@@ -299,6 +226,8 @@ class RadioBrowserSource(RB.StreamingSource):
             settings.set_property("gtk_button_images",True)
             #Gtk.Settings.gtk_button_images(True)
 
+            self.event_page_switch(_,_,0)
+
         # rhythmbox 0.13.3 does not have the following method
         try:
             rb.BrowserSource.do_impl_activate (self)
@@ -306,12 +235,14 @@ class RadioBrowserSource(RB.StreamingSource):
             print "ignored error"
 
     def searchEngines(self):
+        print "searchEngines"
         yield FeedIcecast(self.cache_dir,self.update_download_status)
         yield FeedBoard(self.cache_dir,self.update_download_status)
         #yield FeedShoutcast(self.cache_dir,self.update_download_status)
         yield FeedRadioTime(self.cache_dir,self.update_download_status)
 
     def doSearch(self, term):
+        print "doSearch"
         search_model = Gtk.ListStore(str)
         search_model.append((_("Searching for : '%s'") % term,))
 
@@ -322,6 +253,7 @@ class RadioBrowserSource(RB.StreamingSource):
         search_thread.start()
 
     def doSearchThread(self,term):
+        print "doSearchThread"
         results = {}
         self.station_actions = {}
 
@@ -358,6 +290,7 @@ class RadioBrowserSource(RB.StreamingSource):
         Gdk.threads_leave()
             
     def download_click_statistic(self):
+        print "download_click_statistic"
         # download statistics
         statisticsStr = ""
         try:
@@ -377,6 +310,7 @@ class RadioBrowserSource(RB.StreamingSource):
         self.refill_statistics(thread=True)
     
     def shortStr(self,longstring,maxlen):
+        print "shortStr"
         if len(longstring) > maxlen:
             short_value = longstring[0:maxlen-3]+"..."
         else:
@@ -384,6 +318,7 @@ class RadioBrowserSource(RB.StreamingSource):
         return short_value
     
     def refill_statistics(self, thread=False):
+        print "refill_statistics"
         # check if already downloaded
         try:
             self.statistics_handler
@@ -592,6 +527,7 @@ class RadioBrowserSource(RB.StreamingSource):
 
     """ handler for page switches in the main notebook """
     def event_page_switch(self,notebook,page,page_num):
+        print "event_page_switch"
         if page_num == 0:
             # update favourites each time user selects it
             self.refill_favourites()
@@ -605,6 +541,7 @@ class RadioBrowserSource(RB.StreamingSource):
 
     """ listener on double click in search view """
     def on_item_activated_icon_view(self,widget,item):
+        print "on_item_activated_icon_view"
         model = widget.get_model()
         station = model[item][1]
 
@@ -613,8 +550,10 @@ class RadioBrowserSource(RB.StreamingSource):
     """ listener on selection change in search view """
     def on_selection_changed_icon_view(self,widget):
         print "on_selection_changed_icon_view"
-        model = widget.get_model()
-        items = widget.get_selected_items()
+        #model = widget.get_model()
+        #items = widget.get_selected_items()
+        model = self.icon_view.get_model()
+        items = self.icon_view.get_selected_items()
 
         if len(items) == 1:
             print "time to update with the info box"
@@ -816,6 +755,7 @@ class RadioBrowserSource(RB.StreamingSource):
 
     """ icon download worker thread function """
     def icon_download_worker(self):
+        print "icon_download_worker"
         while True:
             filepath,src = self.icon_download_queue.get()
 
@@ -830,6 +770,7 @@ class RadioBrowserSource(RB.StreamingSource):
 
     """ tries to load icon from disk and if found it saves it in cache returns it """
     def get_icon_pixbuf(self,filepath,return_value_not_found=None):
+        print "get_icon_pixbuf"
         if os.path.exists(filepath):
             icon = None
 
@@ -848,6 +789,7 @@ class RadioBrowserSource(RB.StreamingSource):
 
     """ data display function for tree view """
     def model_data_func(self,column,cell,model,iter,infostr):
+        print "model_data_func"
         obj = model.get_value(iter,1)
         self.clef_icon = self.get_icon_pixbuf(rb.find_plugin_file(self.plugin, "note.png"))
 
@@ -883,6 +825,7 @@ class RadioBrowserSource(RB.StreamingSource):
 
     """ transmits station information to board """
     def transmit_station(self,station):
+        print "transmit_station"
         params = urllib.urlencode({'action':'clicked','name': station.server_name,'url': station.getRealURL(),'source':station.type})
         f = urllib.urlopen(BOARD_ROOT+"?%s" % params)
         f.read()
@@ -897,6 +840,7 @@ class RadioBrowserSource(RB.StreamingSource):
     """
     """ stream information listener """
     def info_available(self,player,uri,field,value):
+        print "info_available"
         if field == RB_METADATA_FIELD_TITLE:
             self.title = value
             self.set_streaming_title(self.title)
@@ -932,6 +876,7 @@ class RadioBrowserSource(RB.StreamingSource):
 #       print "property changed "+str(new)
 
     def record_uri(self,station):
+        print "record_uri"
         play_thread = threading.Thread(target = self.play_uri_,args = (station,True))
         play_thread.setDaemon(True)
         play_thread.start()
@@ -941,12 +886,12 @@ class RadioBrowserSource(RB.StreamingSource):
         print "filter_entry_changed"
         if self.filter_entry.get_text() == "" and self.filter_entry_genre.get_text() == "":
             print "entry and genre are empty"
-            self.tree_view_container.show_all()
+            self.tree_view_container.show()
             self.icon_view_container.hide()
         else:
             print "entry or genre has a value"
             self.tree_view_container.hide()
-            self.icon_view_container.show_all()
+            self.icon_view_container.show()
 
         self.icon_view.set_model(None)
         if not self.filtered_icon_view_store == None:
@@ -957,6 +902,7 @@ class RadioBrowserSource(RB.StreamingSource):
 
     """ callback for item filtering """
     def list_store_visible_func(self,model,iter,destroy):
+        #print "list_store_visible_func"
         # returns true if the row should be visible
         if len(model) == 0:
             return True
@@ -990,6 +936,7 @@ class RadioBrowserSource(RB.StreamingSource):
 
     """ handler for update toolbar button """
     def update_button_clicked(self,widget):
+        print "update_button_clicked"
         if not self.updating:
             # delete cache files
             files = os.listdir(self.cache_dir)
@@ -1001,6 +948,7 @@ class RadioBrowserSource(RB.StreamingSource):
             self.refill_list()
 
     def clear_iconcache_button_clicked(self, widget):
+        print "clear_iconcache_button_clicked"
         if not self.updating:
             # delete cache files
             files = os.listdir(self.icon_cache_dir)
@@ -1015,12 +963,14 @@ class RadioBrowserSource(RB.StreamingSource):
 
     """ starts playback of the station """
     def play_uri(self,station):
+        print "play_uri"
         station.updateRealURL()
         play_thread = threading.Thread(target = self.play_uri_,args = (station,))
         play_thread.setDaemon(True)
         play_thread.start()
 
     def play_uri_(self,station,record=False):
+        print "play_uri_"
         # do not play while downloading
         if self.updating:
             return
@@ -1143,6 +1093,7 @@ class RadioBrowserSource(RB.StreamingSource):
             transmit_thread.start()
 
     def download_feed(self,feed):
+        print "download_feed"
         tryno = 0
         self.updating = True
         while True:
@@ -1172,6 +1123,7 @@ class RadioBrowserSource(RB.StreamingSource):
         self.refill_list()
 
     def do_impl_delete_thyself(self):
+        print "do_impl_delete_thyself"
         if self.hasActivated:
             # kill all running records
             for uri in self.recording_streams.keys():
@@ -1179,6 +1131,7 @@ class RadioBrowserSource(RB.StreamingSource):
             self.shell = False
 
     def engines(self):
+        print "engines"
         yield FeedIcecast(self.cache_dir,self.update_download_status)
         yield FeedBoard(self.cache_dir,self.update_download_status)
         #yield FeedShoutcast(self.cache_dir,self.update_download_status)
@@ -1186,10 +1139,12 @@ class RadioBrowserSource(RB.StreamingSource):
         yield FeedRadioTimeLocal(self.cache_dir,self.update_download_status)
 
     def get_stock_icon(self, name):
+        #print "get_stock_icon"
         theme = Gtk.icon_theme_get_default()
         return theme.load_icon(name, 48, 0)
 
     def load_icon_file(self,filepath,value_not_found):
+        #print "load_icon_file"
         icon = value_not_found
         try:
             icon = Pixbuf.new_from_file_at_size(filepath,72,72)
@@ -1198,6 +1153,7 @@ class RadioBrowserSource(RB.StreamingSource):
         return icon
 
     def get_station_icon(self,station,default_icon):
+        #print "get_station_icon"
         # default icon
         icon = default_icon
 
@@ -1214,6 +1170,7 @@ class RadioBrowserSource(RB.StreamingSource):
         return icon
 
     def insert_feed(self,feed,parent):
+        print "insert_feed"
         # preload most used icons
         note_icon = self.load_icon_file(rb.find_plugin_file(self.plugin, "note.png"),None)
         shoutcast_icon = self.load_icon_file(rb.find_plugin_file(self.plugin, "shoutcast-logo.png"),None)
@@ -1339,11 +1296,13 @@ class RadioBrowserSource(RB.StreamingSource):
     def refill_list_worker(self):
         print "refill list worker"
 
+        Gdk.threads_enter() #dm 
         self.station_actions = {}
         tree = self.tree_view.set_model(None)
         self.icon_view.set_model(None)
         #self.filter_entry_genre.set_model()
-
+        Gdk.threads_leave() #dm
+        
         self.updating = True
         # deactivate sorting
         self.icon_view_store = Gtk.ListStore(str,object,GdkPixbuf.Pixbuf)
@@ -1402,15 +1361,17 @@ class RadioBrowserSource(RB.StreamingSource):
         print "connect filter to view"
         self.filtered_icon_view_store = self.icon_view_store.filter_new()
         self.filtered_icon_view_store.set_visible_func(self.list_store_visible_func)
-
+        Gdk.threads_enter() #dm
         self.tree_view.set_model(self.sorted_list_store)
         self.icon_view.set_model(self.filtered_icon_view_store)
         print "filter set model to tree and icon views"
 
-        Gdk.threads_enter()
+        #Gdk.threads_enter()
         self.updating = False
         self.notify_status_changed()
         Gdk.threads_leave()
+
+        print "refill list worker"
 
     def refill_list(self):
         print "refill list"
@@ -1419,6 +1380,7 @@ class RadioBrowserSource(RB.StreamingSource):
         self.list_download_thread.start()
 
     def load_from_file(self,filename):
+        print "load_from_file"
         if not os.path.isfile(filename):
             return None
 
@@ -1433,6 +1395,7 @@ class RadioBrowserSource(RB.StreamingSource):
             return None
 
     def save_to_file(self,filename,obj):
+        print "save_to_file"
         f = open(filename,"w")
         p = pickle.Pickler(f)
         p.dump(obj)
