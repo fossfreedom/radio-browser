@@ -65,6 +65,17 @@ class RadioBrowserSource(RB.StreamingSource):
         self.hasActivated = False
         RB.StreamingSource.__init__(self,name="RadioBrowserPlugin")
 
+    def do_get_status(self, *args):
+        '''
+        Method called by Rhythmbox to figure out what to show on this source
+        statusbar.
+        '''
+
+        if self.updating:
+            return (self.load_status, '', 1)
+        else:
+            return ('','',1)
+
     def do_set_property(self, property, value):
         if property.name == 'plugin':
             self.plugin = value
@@ -93,7 +104,6 @@ class RadioBrowserSource(RB.StreamingSource):
         self.load_current_size = current
         self.load_total_size = total
         self.load_status = _("Loading %(url)s") % {'url':filename}
-
         Gdk.threads_enter()
         self.notify_status_changed()
         Gdk.threads_leave()
