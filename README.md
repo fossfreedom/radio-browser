@@ -12,6 +12,15 @@ for Rhythmbox 2.96
 [![Flattr Button](http://api.flattr.com/button/button-static-50x60.png "Flattr This!")](https://flattr.com/thing/1237090/fossfreedomradio-browser-on-GitHub "Rhythmbox Radio Browser")
 
 
+Installation
+------------
+
+git clone https://github.com/fossfreedom/radio-browser
+cd radio-browser
+./install.sh
+
+Then launch rhythmbox and enable the plugin "Internet Radio Browser"
+
 Ubuntu 12.04 notes:
 -------------------
 
