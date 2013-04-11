@@ -43,4 +43,8 @@ packages required to be installed:
 
     sudo apt-get install streamripper gir1.2-gconf-2.0
 
+This is packaged in my PPA:
 
+    sudo add-apt-repository ppa:fossfreedom/rhythmbox-plugins
+    sudo apt-get update
+    sudo apt-get install rhythmbox-plugin-radio-browser
