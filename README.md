@@ -15,9 +15,11 @@ for Rhythmbox 2.96
 Installation
 ------------
 
+<pre>
 git clone https://github.com/fossfreedom/radio-browser
 cd radio-browser
 ./install.sh
+</pre>
 
 Then launch rhythmbox and enable the plugin "Internet Radio Browser"
 
