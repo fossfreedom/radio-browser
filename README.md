@@ -12,11 +12,27 @@ for Rhythmbox 2.96
 [![Flattr Button](http://api.flattr.com/button/button-static-50x60.png "Flattr This!")](https://flattr.com/thing/1237090/fossfreedomradio-browser-on-GitHub "Rhythmbox Radio Browser")
 
 
-Ubuntu 12.04 notes:
+Installation
+------------
+
+<pre>
+git clone https://github.com/fossfreedom/radio-browser
+cd radio-browser
+./install.sh
+</pre>
+
+Then launch rhythmbox and enable the plugin "Internet Radio Browser"
+
+Non-Debian based distros
+------------------------
+
+You will need to install the equivalent packages for your distro: `streamripper gir1.2-gconf-2.0`
+
+Debian & Ubuntu 12.04 notes:
 -------------------
 
 packages required to be installed:
 
-   sudo apt-get install streamripper gir1.2-gconf-2.0
+    sudo apt-get install streamripper gir1.2-gconf-2.0
 
 
