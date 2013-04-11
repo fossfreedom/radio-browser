@@ -21,6 +21,14 @@ cd radio-browser
 ./install.sh
 </pre>
 
+For a system wide install then:
+
+<pre>
+git clone https://github.com/fossfreedom/radio-browser
+cd radio-browser
+sudo make install
+</pre>
+
 Then launch rhythmbox and enable the plugin "Internet Radio Browser"
 
 Non-Debian based distros
