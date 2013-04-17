@@ -37,4 +37,5 @@ Description[ru]=Показывать icecast и shoutcast радиостанци
 Authors=fossfreedom <foss.freedom@gmail.com>, Murauer Alexander <segler_alex@web.de>
 Copyright=Copyright © 2012 fossfreedom
 Website=https://github.com/fossfreedom/radio-browser
+Help=https://github.com/fossfreedom/radio-browser/blob/master/README.md
 Icon=radio-browser.png
