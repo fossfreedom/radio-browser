@@ -198,20 +198,20 @@ class RadioBrowserPlugin (GObject.GObject, Peas.Activatable):
 
 
 
-        self.actiongroup = Gtk.ActionGroup('RadioBrowserActionGroup')
+        #self.actiongroup = Gtk.ActionGroup('RadioBrowserActionGroup')
 
         # add "update-all" action to the toolbar
-        action = Gtk.Action('UpdateList', None, _("Update radio station list"), Gtk.STOCK_GO_DOWN)
-        action.connect('activate', lambda a: action_update_list())
-        self.actiongroup.add_action(action)
+        #action = Gtk.Action('UpdateList', None, _("Update radio station list"), Gtk.STOCK_GO_DOWN)
+        #action.connect('activate', lambda a: action_update_list())
+        #self.actiongroup.add_action(action)
 
-        action = Gtk.Action('ClearIconCache', None, _("Clear icon cache"), Gtk.STOCK_CLEAR)
-        action.connect('activate', lambda a: action_remove_images())
-        self.actiongroup.add_action(action)
+        #action = Gtk.Action('ClearIconCache', None, _("Clear icon cache"), Gtk.STOCK_CLEAR)
+        #action.connect('activate', lambda a: action_remove_images())
+        #self.actiongroup.add_action(action)
 
-        uim = self.shell.props.ui_manager
-        uim.insert_action_group (self.actiongroup)
-        uim.ensure_update()
+        #uim = self.shell.props.ui_manager
+        #uim.insert_action_group (self.actiongroup)
+        #uim.ensure_update()
 
         # try reading gconf entries and set default values if not readable
         self.download_trys = self.gconf.get_string(gconf_keys['download_trys'])
@@ -258,8 +258,8 @@ class RadioBrowserPlugin (GObject.GObject, Peas.Activatable):
 
     """ on plugin deactivation """
     def do_deactivate(self):
-        uim = self.shell.props.ui_manager
-        uim.remove_action_group(self.actiongroup)
-        self.actiongroup = None
+        #uim = self.shell.props.ui_manager
+        #uim.remove_action_group(self.actiongroup)
+        #self.actiongroup = None
         self.source.delete_thyself()
         self.source = None
