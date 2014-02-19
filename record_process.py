@@ -54,8 +54,8 @@ class RecordProcess(threading.Thread,Gtk.VBox):
 
         # prepare streamripper
         commandline = ["streamripper",uri,"-d",outputpath,"-r","-o","larger"]
-        print "streamripper commandline"
-        print commandline
+        print("streamripper commandline")
+        print(commandline)
         self.process = subprocess.Popen(commandline,stdout=subprocess.PIPE)
 
         # infobox
@@ -126,7 +126,7 @@ class RecordProcess(threading.Thread,Gtk.VBox):
         cell.set_property("text",datetime.fromtimestamp(seconds).strftime("%x %X"))
 
     def play(self,filename):
-        print filename
+        print(filename)
         subprocess.call(["rhythmbox",filename])
 
     def refillList(self):
@@ -187,7 +187,7 @@ class RecordProcess(threading.Thread,Gtk.VBox):
                 try:
                     char = pout.read(1)
                 except:
-                    print "exception"
+                    print("exception")
                     break
 
                 if char == None or char == "":
@@ -223,7 +223,7 @@ class RecordProcess(threading.Thread,Gtk.VBox):
 
             GObject.idle_add(self.set_info_box)
 
-        print "thread closed"
+        print("thread closed")
         
         Gdk.threads_enter()
         self.get_parent().set_current_page(0)

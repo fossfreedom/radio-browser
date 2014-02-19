@@ -16,8 +16,8 @@
 #    along with Radio-Browser-Plugin.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 import xml.sax.handler
 
 from radio_station import RadioStation
@@ -28,8 +28,8 @@ class RadioTimeRadioStation(RadioStation):
         self.listen_urls = []
         try:
             url = "http://opml.radiotime.com/Tune.ashx?id="+self.listen_id
-            print "tunein:"+url
-            remote = urllib2.urlopen(url)
+            print("tunein:"+url)
+            remote = urllib.request.urlopen(url)
             data = remote.read()
             remote.close()
 
@@ -37,7 +37,7 @@ class RadioTimeRadioStation(RadioStation):
             for line in lines:
                 if not line.startswith("#"):
                     self.listen_urls.append(line)
-                    print "new link:"+line
+                    print("new link:"+line)
             self.askUserAboutUrls()
 
         except:
@@ -95,32 +95,32 @@ class FeedRadioTime(Feed):
         self.cache_dir = cache_dir
         self.status_change_handler = status_change_handler
         self.filename = os.path.join(self.cache_dir, "radiotime.xml")
-        self.uri = "http://opml.radiotime.com/Browse.ashx?%s" % urllib.urlencode({"id":"r0","formats":"ogg,mp3,aac,wma"})
+        self.uri = "http://opml.radiotime.com/Browse.ashx?%s" % urllib.parse.urlencode({"id":"r0","formats":"ogg,mp3,aac,wma"})
         self._name = "RadioTime"
         self.setUpdateChecking(False)
 
     def loadGenreList(self):
         global RadioTimeGenreList
-        print "load genre list"
+        print("load genre list")
 
         url = "http://opml.radiotime.com/Describe.ashx?c=genres"
         handler = RadioTimeHandler()
         RadioTimeGenreList = {}
 
         try:
-            remote = urllib2.urlopen(url)
+            remote = urllib.request.urlopen(url)
             xmlData = remote.read()
             remote.close()
-        except Exception, e:
-            print "could not load genre list"
-            print str(e)
+        except Exception as e:
+            print("could not load genre list")
+            print(str(e))
             return
 
         try:
             xml.sax.parseString(xmlData,handler)
             RadioTimeGenreList = handler.genres
         except:
-            print "parse failed of "+xmlData
+            print("parse failed of "+xmlData)
 
     def entries(self):
         items = Feed.entries(self)
@@ -143,8 +143,8 @@ class FeedRadioTime(Feed):
         return "http://radiotime.com/"
 
     def search(self,term):
-        searchUrl = "http://opml.radiotime.com/Search.ashx?%s" % urllib.urlencode({"query":term,"formats":"ogg,mp3,aac,wma"})
-        print("url:"+searchUrl)
+        searchUrl = "http://opml.radiotime.com/Search.ashx?%s" % urllib.parse.urlencode({"query":term,"formats":"ogg,mp3,aac,wma"})
+        print(("url:"+searchUrl))
         data = self.downloadFile(searchUrl)
         handler = RadioTimeHandler()
         if data != None:
@@ -156,6 +156,6 @@ class FeedRadioTime(Feed):
 class FeedRadioTimeLocal(FeedRadioTime):
     def __init__(self,cache_dir,status_change_handler):
         FeedRadioTime.__init__(self,cache_dir,status_change_handler)
-        self.uri = "http://opml.radiotime.com/Browse.ashx?%s" % urllib.urlencode({"c":"local","formats":"ogg,mp3,aac,wma"})
+        self.uri = "http://opml.radiotime.com/Browse.ashx?%s" % urllib.parse.urlencode({"c":"local","formats":"ogg,mp3,aac,wma"})
         self._name = "RadioTime Local"
         self.filename = os.path.join(self.cache_dir, "radiotime-local.xml")

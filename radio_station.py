@@ -40,11 +40,11 @@ class RadioStation:
         return self.listen_url
 
     def getId(self):
-        val = self.id.decode('utf-8')
+        val = self.id
         if not val == '':
-            return int(self.id.decode('utf-8'))
+            return int(self.id)
         else:
-            print "no id"
+            print("no id")
             return 0
 
     def updateRealURL(self):
@@ -87,7 +87,7 @@ class RadioStation:
             (model, iter) = treeselection.get_selected()
             self.listen_url = model.get_value(iter,0)
             Gdk.threads_leave()
-            print "choosen link:"+self.listen_url
+            print("choosen link:"+self.listen_url)
 
-        except Exception,e:
-            print e
+        except Exception as e:
+            print(e)

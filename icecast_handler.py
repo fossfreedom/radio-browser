@@ -48,7 +48,7 @@ class IcecastHandler(xml.sax.handler.ContentHandler):
     def endElement(self, name):
         if name == "entry":
             try:
-                self.entry.homepage = "http://dir.xiph.org/search?search="+urllib.quote_plus(self.entry.server_name)
+                self.entry.homepage = "http://dir.xiph.org/search?search="+urllib.parse.quote_plus(self.entry.server_name)
             except:
                 self.entry.homepage = ""
             self.entry.genre = ",".join(self.entry.genre.split(" "))
@@ -59,7 +59,7 @@ class IcecastHandler(xml.sax.handler.ContentHandler):
 class FeedIcecast(Feed):
     def __init__(self,cache_dir,status_change_handler):
         Feed.__init__(self)
-        print "init icecast feed"
+        print("init icecast feed")
         self.handler = IcecastHandler()
         self.cache_dir = cache_dir
         self.filename = os.path.join(self.cache_dir, "icecast.xml")

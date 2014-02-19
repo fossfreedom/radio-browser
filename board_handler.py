@@ -16,7 +16,7 @@
 #    along with Radio-Browser-Plugin.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import urllib
+import urllib.request, urllib.parse, urllib.error
 from gi.repository import Gtk
 import xml.sax.handler
 
@@ -118,7 +118,7 @@ class PostStationDialog(Gtk.Dialog):
 class FeedBoard(Feed):
     def __init__(self,cache_dir,status_change_handler):
         Feed.__init__(self)
-        print "init board feed"
+        print("init board feed")
         self.handler = BoardHandler()
         self.cache_dir = cache_dir
         self.filename = os.path.join(self.cache_dir, "board.xml")
@@ -149,8 +149,8 @@ class FeedBoard(Feed):
         message.format_secondary_text(_("Do you really want to vote for this station? It means, that you like it, and you want more people to know, that this is a good station."))
         response = message.run()
         if response == Gtk.RESPONSE_YES:
-            params = urllib.urlencode({'action': 'vote','id': station.id})
-            f = urllib.urlopen("http://www.radio-browser.info/?%s" % params)
+            params = urllib.parse.urlencode({'action': 'vote','id': station.id})
+            f = urllib.request.urlopen("http://www.radio-browser.info/?%s" % params)
             f.read()
             source.refill_list()
         message.destroy()
@@ -161,8 +161,8 @@ class FeedBoard(Feed):
         message.format_secondary_text(_("Do you really want to mark this radio station as broken? It will eventually get deleted if enough people do that! More information on that on the feeds homepage: http://www.radio-browser.info/"))
         response = message.run()
         if response == Gtk.RESPONSE_YES:
-            params = urllib.urlencode({'action': 'negativevote','id': station.id})
-            f = urllib.urlopen("http://www.radio-browser.info/?%s" % params)
+            params = urllib.parse.urlencode({'action': 'negativevote','id': station.id})
+            f = urllib.request.urlopen("http://www.radio-browser.info/?%s" % params)
             f.read()
             source.refill_list()
         message.destroy()
@@ -221,8 +221,8 @@ class FeedBoard(Feed):
                         show_message(_("Favicon URL needs to start with http://"))
                         continue
                 
-                params = urllib.urlencode({'action': 'add','name': Name, 'url': URL, 'homepage': Homepage,'favicon': Favicon, 'tags': Tags,'language': Language, 'country':Country})
-                f = urllib.urlopen("http://www.radio-browser.info/?%s" % params)
+                params = urllib.parse.urlencode({'action': 'add','name': Name, 'url': URL, 'homepage': Homepage,'favicon': Favicon, 'tags': Tags,'language': Language, 'country':Country})
+                f = urllib.request.urlopen("http://www.radio-browser.info/?%s" % params)
                 f.read()
 
                 show_message(_("Station successfully posted"))

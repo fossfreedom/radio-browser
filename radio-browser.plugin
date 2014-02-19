@@ -16,7 +16,7 @@
 #    along with Radio-Browser-Plugin.  If not, see <http://www.gnu.org/licenses/>.
 
 [Plugin]
-Loader=python
+Loader=python3
 Module=radio-browser
 IAge=2
 Name=Internet radio station browser

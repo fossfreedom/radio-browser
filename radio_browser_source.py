@@ -23,19 +23,19 @@ from gi.repository import GdkPixbuf
 from gi.repository.GdkPixbuf import Pixbuf
 from gi.repository import GLib
 import rb
-import httplib
+import http.client
 import os
 import subprocess
 from threading import Thread
 import threading
 import hashlib
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import webbrowser
-import Queue
+import queue
 import pickle
 import datetime
 import math
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 
 import xml.sax.saxutils
 from radio_station import RadioStation
@@ -82,15 +82,15 @@ class RadioBrowserSource(RB.StreamingSource):
 
     """ return list of actions that should be displayed in toolbar """
     def do_get_ui_actions(self):
-        print "do_get_ui_actions"
+        print("do_get_ui_actions")
         return self.do_impl_get_ui_actions()
 
     def do_impl_get_ui_actions(self):
-        print "do_impl_get_ui_actions"
+        print("do_impl_get_ui_actions")
         return ["UpdateList","ClearIconCache"]
 
     def do_impl_get_status(self):
-        print "do_impl_get_status"
+        print("do_impl_get_status")
         if self.updating:
             progress = -1.0
             if self.load_total_size > 0:
@@ -109,12 +109,12 @@ class RadioBrowserSource(RB.StreamingSource):
         Gdk.threads_leave()
 
     def do_selected(self):
-        print "do_selected"
+        print("do_selected")
         self.do_impl_activate()
 
     """ on source actiavation, e.g. double click on source or playing something in this source """
     def do_impl_activate(self):
-        print "do_impl_activate"
+        print("do_impl_activate")
         # first time of activation -> add graphical stuff
         if not self.hasActivated:
             self.plugin = self.props.plugin
@@ -131,10 +131,10 @@ class RadioBrowserSource(RB.StreamingSource):
             self.cache_dir = RB.find_user_cache_file("radio-browser")
 
             if os.path.exists(self.cache_dir) is False:
-                os.makedirs(self.cache_dir, 0700)
+                os.makedirs(self.cache_dir, 0o700)
             self.icon_cache_dir = os.path.join(self.cache_dir,"icons")
             if os.path.exists(self.icon_cache_dir) is False:
-                os.makedirs(self.icon_cache_dir,0700)
+                os.makedirs(self.icon_cache_dir,0o700)
             self.updating = False
             self.load_current_size = 0
             self.load_total_size = 0
@@ -190,7 +190,7 @@ class RadioBrowserSource(RB.StreamingSource):
             self.start_box = ui.get_object('start_box')
 
             # prepare search tab
-            print "prepare search tab"
+            print("prepare search tab")
             self.info_box_search = ui.get_object('info_box_search')
             self.search_box = ui.get_object('search_box')
             self.search_entry = ui.get_object('search_entry')
@@ -223,7 +223,7 @@ class RadioBrowserSource(RB.StreamingSource):
             # start icon downloader thread
             # use queue for communication with thread
             # enqueued addresses will get downloaded
-            self.icon_download_queue = Queue.Queue()
+            self.icon_download_queue = queue.Queue()
             self.icon_download_thread = threading.Thread(target = self.icon_download_worker)
             self.icon_download_thread.setDaemon(True)
             self.icon_download_thread.start()
@@ -242,17 +242,17 @@ class RadioBrowserSource(RB.StreamingSource):
         try:
             rb.BrowserSource.do_impl_activate (self)
         except:
-            print "ignored error"
+            print("ignored error")
 
     def searchEngines(self):
-        print "searchEngines"
+        print("searchEngines")
         yield FeedIcecast(self.cache_dir,self.update_download_status)
         yield FeedBoard(self.cache_dir,self.update_download_status)
         #yield FeedShoutcast(self.cache_dir,self.update_download_status)
         yield FeedRadioTime(self.cache_dir,self.update_download_status)
 
     def doSearch(self, term):
-        print "doSearch"
+        print("doSearch")
         search_model = Gtk.ListStore(str)
         search_model.append((_("Searching for : '%s'") % term,))
 
@@ -263,7 +263,7 @@ class RadioBrowserSource(RB.StreamingSource):
         search_thread.start()
 
     def doSearchThread(self,term):
-        print "doSearchThread"
+        print("doSearchThread")
         results = {}
         self.station_actions = {}
 
@@ -272,7 +272,7 @@ class RadioBrowserSource(RB.StreamingSource):
             try:
                 feed.search
             except:
-                print "no search support in : "+feed.name()
+                print("no search support in : "+feed.name())
                 continue
 
             # call search method
@@ -280,15 +280,15 @@ class RadioBrowserSource(RB.StreamingSource):
                 self.station_actions[feed.name()] = feed.get_station_actions()
                 result = feed.search(term)
                 results[feed.name()] = result
-            except Exception,e:
-                print "error with source:"+feed.name()
-                print "error:"+str(e)
+            except Exception as e:
+                print("error with source:"+feed.name())
+                print("error:"+str(e))
 
         Gdk.threads_enter()
         # create new model
         new_model = Gtk.TreeStore(str,object)
         # add entries to model
-        for name in results.keys():
+        for name in list(results.keys()):
             result = results[name]
             source_parent = new_model.append(None,(name+" ("+str(len(result))+")",None))
             for entry in result:
@@ -300,16 +300,16 @@ class RadioBrowserSource(RB.StreamingSource):
         Gdk.threads_leave()
             
     def download_click_statistic(self):
-        print "download_click_statistic"
+        print("download_click_statistic")
         # download statistics
         statisticsStr = ""
         try:
-            remotefile = urllib2.urlopen("http://www.radio-browser.info/topclick.php?limit=10")
+            remotefile = urllib.request.urlopen("http://www.radio-browser.info/topclick.php?limit=10")
             statisticsStr = remotefile.read()
         
-        except Exception, e:
-            print "download failed exception"
-            print e
+        except Exception as e:
+            print("download failed exception")
+            print(e)
             return
         
         # parse statistics
@@ -320,7 +320,7 @@ class RadioBrowserSource(RB.StreamingSource):
         self.refill_statistics(thread=True)
     
     def shortStr(self,longstring,maxlen):
-        print "shortStr"
+        print("shortStr")
         if len(longstring) > maxlen:
             short_value = longstring[0:maxlen-3]+"..."
         else:
@@ -328,7 +328,7 @@ class RadioBrowserSource(RB.StreamingSource):
         return short_value
     
     def refill_statistics(self, thread=False):
-        print "refill_statistics"
+        print("refill_statistics")
         # check if already downloaded
         try:
             self.statistics_handler
@@ -373,7 +373,7 @@ class RadioBrowserSource(RB.StreamingSource):
             Gdk.threads_leave()
 
     def refill_favourites(self):
-        print "refill favourites"
+        print("refill favourites")
         
         (hasfound, width, height) = Gtk.icon_size_lookup(Gtk.IconSize.BUTTON)
         # remove all old information in infobox
@@ -472,7 +472,7 @@ class RadioBrowserSource(RB.StreamingSource):
                             img.show()
                             button.set_image(img)
                 except:
-                    print "could not set image for station:"+str(station.server_name)
+                    print("could not set image for station:"+str(station.server_name))
         
         if len(sortedkeys)>0:
             decorated_box.show_all()
@@ -530,14 +530,14 @@ class RadioBrowserSource(RB.StreamingSource):
                         img.show()
                         button.set_image(img)
             except:
-                print "could not set image for station:"+str(station.server_name)
+                print("could not set image for station:"+str(station.server_name))
 
         if (len(sortedkeys) > 0):
             decorated_box.show_all()
 
     """ handler for page switches in the main notebook """
     def event_page_switch(self,notebook,page,page_num):
-        print "event_page_switch"
+        print("event_page_switch")
         if page_num == 0:
             # update favourites each time user selects it
             self.refill_favourites()
@@ -551,7 +551,7 @@ class RadioBrowserSource(RB.StreamingSource):
 
     """ listener on double click in search view """
     def on_item_activated_icon_view(self,widget,item):
-        print "on_item_activated_icon_view"
+        print("on_item_activated_icon_view")
         model = widget.get_model()
         station = model[item][1]
 
@@ -559,21 +559,21 @@ class RadioBrowserSource(RB.StreamingSource):
 
     """ listener on selection change in search view """
     def on_selection_changed_icon_view(self,widget):
-        print "on_selection_changed_icon_view"
+        print("on_selection_changed_icon_view")
         #model = widget.get_model()
         #items = widget.get_selected_items()
         model = self.icon_view.get_model()
         items = self.icon_view.get_selected_items()
 
         if len(items) == 1:
-            print "time to update with the info box"
+            print("time to update with the info box")
             obj = model[items[0]][1]
             self.update_info_box(obj,self.info_box_tree)#dm2
     
     """ listener for selection changes """
     def treeview_cursor_changed_handler(self,treeview,info_box):
         # get selected item
-        print "treeview_cursor_changed_handler"
+        print("treeview_cursor_changed_handler")
         selection = treeview.get_selection()
         model,iter = selection.get_selected()
 
@@ -583,7 +583,7 @@ class RadioBrowserSource(RB.StreamingSource):
             self.update_info_box(obj,info_box)
 
     def update_info_box(self,obj,info_box):
-        print "update_info_box"
+        print("update_info_box")
         # remove all old information in infobox
         for widget in info_box.get_children():
             info_box.remove(widget)
@@ -727,7 +727,7 @@ class RadioBrowserSource(RB.StreamingSource):
                 process.communicate()
                 process.wait()
             except(OSError):
-                print "streamripper not found"
+                print("streamripper not found")
             else:
                 button = Gtk.Button(_("Record"))
                 button.connect("clicked", button_record_handler, obj)
@@ -743,7 +743,7 @@ class RadioBrowserSource(RB.StreamingSource):
             button.connect("clicked", button_bookmark_handler, obj)
             button_box.pack_start(button,False,False,0)
 
-            if station.type in self.station_actions.keys():
+            if station.type in list(self.station_actions.keys()):
                 actions = self.station_actions[station.type]
                 for action in actions:
                     button = Gtk.Button(action.name)
@@ -759,20 +759,20 @@ class RadioBrowserSource(RB.StreamingSource):
         decorated_info_box.add(sub_info_box)
 
         info_box.pack_start(decorated_info_box,True, True, 0) #dm
-        print decorated_info_box
+        print(decorated_info_box)
         info_box.show_all()
-        print "finished info box routine"
+        print("finished info box routine")
 
     """ icon download worker thread function """
     def icon_download_worker(self):
-        print "icon_download_worker"
+        print("icon_download_worker")
         while True:
             filepath,src = self.icon_download_queue.get()
 
             if os.path.exists(filepath) is False:
                 if src.lower().startswith("http://"):
                     try:
-                        urllib.urlretrieve(src,filepath)
+                        urllib.request.urlretrieve(src,filepath)
                     except:
                         pass
 
@@ -780,7 +780,7 @@ class RadioBrowserSource(RB.StreamingSource):
 
     """ tries to load icon from disk and if found it saves it in cache returns it """
     def get_icon_pixbuf(self,filepath,return_value_not_found=None):
-        print "get_icon_pixbuf"
+        print("get_icon_pixbuf")
         if os.path.exists(filepath):
             icon = None
 
@@ -799,7 +799,7 @@ class RadioBrowserSource(RB.StreamingSource):
 
     """ data display function for tree view """
     def model_data_func(self,column,cell,model,iter,infostr):
-        print "model_data_func"
+        print("model_data_func")
         obj = model.get_value(iter,1)
         self.clef_icon = self.get_icon_pixbuf(rb.find_plugin_file(self.plugin, "note.png"))
 
@@ -835,11 +835,11 @@ class RadioBrowserSource(RB.StreamingSource):
 
     """ transmits station information to board """
     def transmit_station(self,station):
-        print "transmit_station"
-        params = urllib.urlencode({'action':'clicked','name': station.server_name,'url': station.getRealURL(),'source':station.type})
-        f = urllib.urlopen(BOARD_ROOT+"?%s" % params)
+        print("transmit_station")
+        params = urllib.parse.urlencode({'action':'clicked','name': station.server_name,'url': station.getRealURL(),'source':station.type})
+        f = urllib.request.urlopen(BOARD_ROOT+"?%s" % params)
         f.read()
-        print "Transmit station '"+str(station.server_name)+"' OK"
+        print("Transmit station '"+str(station.server_name)+"' OK")
 
     """ transmits title information to board """
     """def transmit_title(self,title):
@@ -850,7 +850,7 @@ class RadioBrowserSource(RB.StreamingSource):
     """
     """ stream information listener """
     def info_available(self,player,uri,field,value):
-        print "info_available"
+        print("info_available")
         if field == RB_METADATA_FIELD_TITLE:
             self.title = value
             self.set_streaming_title(self.title)
@@ -874,7 +874,7 @@ class RadioBrowserSource(RB.StreamingSource):
             pass
 
         else:
-            print "Server sent unknown info '"+str(field)+"':'"+str(value)+"'"
+            print("Server sent unknown info '"+str(field)+"':'"+str(value)+"'")
 
 #   def playing_changed (self, sp, playing):
 #       print "playing changed"
@@ -886,20 +886,20 @@ class RadioBrowserSource(RB.StreamingSource):
 #       print "property changed "+str(new)
 
     def record_uri(self,station):
-        print "record_uri"
+        print("record_uri")
         play_thread = threading.Thread(target = self.play_uri_,args = (station,True))
         play_thread.setDaemon(True)
         play_thread.start()
 
     """ listener for filter entry change """
     def filter_entry_changed(self,Gtk_entry):
-        print "filter_entry_changed"
+        print("filter_entry_changed")
         if self.filter_entry.get_text() == "" and self.filter_entry_genre.get_text() == "":
-            print "entry and genre are empty"
+            print("entry and genre are empty")
             self.tree_view_container.show()
             self.icon_view_container.hide()
         else:
-            print "entry or genre has a value"
+            print("entry or genre has a value")
             self.tree_view_container.hide()
             self.icon_view_container.show()
 
@@ -946,7 +946,7 @@ class RadioBrowserSource(RB.StreamingSource):
 
     """ handler for update toolbar button """
     def update_button_clicked(self,widget):
-        print "update_button_clicked"
+        print("update_button_clicked")
         if not self.updating:
             # delete cache files
             files = os.listdir(self.cache_dir)
@@ -958,7 +958,7 @@ class RadioBrowserSource(RB.StreamingSource):
             self.refill_list()
 
     def clear_iconcache_button_clicked(self, widget):
-        print "clear_iconcache_button_clicked"
+        print("clear_iconcache_button_clicked")
         if not self.updating:
             # delete cache files
             files = os.listdir(self.icon_cache_dir)
@@ -973,14 +973,14 @@ class RadioBrowserSource(RB.StreamingSource):
 
     """ starts playback of the station """
     def play_uri(self,station):
-        print "play_uri"
+        print("play_uri")
         station.updateRealURL()
         play_thread = threading.Thread(target = self.play_uri_,args = (station,))
         play_thread.setDaemon(True)
         play_thread.start()
 
     def play_uri_(self,station,record=False):
-        print "play_uri_"
+        print("play_uri_")
         # do not play while downloading
         if self.updating:
             return
@@ -1062,8 +1062,8 @@ class RadioBrowserSource(RB.StreamingSource):
                 #self.shell.props.db.entry_delete(self.entry)
                 entry = RB.RhythmDBEntry.new(self.db, self.entry_type, station.getRealURL())                
 #               self.entry = self.shell.props.db.entry_new(self.entry_type, station.getRealURL())
-                print station.getRealURL()
-                print station.getId()
+                print(station.getRealURL())
+                print(station.getId())
 #               server = station.server_name
 #               self.db.entry_set(entry,RB.RhythmDBPropType.TITLE, server)
                 self.db.entry_set(entry, RB.RhythmDBPropType.TITLE, station.getId())
@@ -1083,7 +1083,7 @@ class RadioBrowserSource(RB.StreamingSource):
 
     """ handler for double clicks in tree view """
     def row_activated_handler(self,treeview,path,column):
-        print "row_activated_handler (treeview double click)"
+        print("row_activated_handler (treeview double click)")
         model = treeview.get_model()
         myiter = model.get_iter(path)
         
@@ -1103,7 +1103,7 @@ class RadioBrowserSource(RB.StreamingSource):
             transmit_thread.start()
 
     def download_feed(self,feed):
-        print "download_feed"
+        print("download_feed")
         tryno = 0
         self.updating = True
         while True:
@@ -1133,15 +1133,15 @@ class RadioBrowserSource(RB.StreamingSource):
         self.refill_list()
 
     def do_impl_delete_thyself(self):
-        print "do_impl_delete_thyself"
+        print("do_impl_delete_thyself")
         if self.hasActivated:
             # kill all running records
-            for uri in self.recording_streams.keys():
+            for uri in list(self.recording_streams.keys()):
                 self.recording_streams[uri].stop()
             self.shell = False
 
     def engines(self):
-        print "engines"
+        print("engines")
         yield FeedIcecast(self.cache_dir,self.update_download_status)
         yield FeedBoard(self.cache_dir,self.update_download_status)
         #yield FeedShoutcast(self.cache_dir,self.update_download_status)
@@ -1180,7 +1180,7 @@ class RadioBrowserSource(RB.StreamingSource):
         return icon
 
     def insert_feed(self,feed,parent):
-        print "insert_feed"
+        print("insert_feed")
         # preload most used icons
         note_icon = self.load_icon_file(rb.find_plugin_file(self.plugin, "note.png"),None)
         shoutcast_icon = self.load_icon_file(rb.find_plugin_file(self.plugin, "shoutcast-logo.png"),None)
@@ -1298,13 +1298,13 @@ class RadioBrowserSource(RB.StreamingSource):
                     self.tree_store.append(countries[country_arr[0]],(station.server_name,station))
 
             else:
-                print "ERROR: unknown class type in feed"
+                print("ERROR: unknown class type in feed")
 
         self.tree_store.set_value(current_iter,0,feed.name()+" ("+str(stations_count)+")")
         return stations_count
 
     def refill_list_worker(self):
-        print "refill list worker"
+        print("refill list worker")
 
         Gdk.threads_enter() #dm 
         self.station_actions = {}
@@ -1328,7 +1328,7 @@ class RadioBrowserSource(RB.StreamingSource):
         if data is None:
             data = {}
         dataNew = {}
-        for name,station in data.items():
+        for name,station in list(data.items()):
             if datetime.datetime.now()-station.PlayTime <= datetime.timedelta(days=float(self.plugin.recently_played_purge_days)):
                 self.tree_store.append(self.recently_iter,(name,station))
                 dataNew[name] = station
@@ -1339,7 +1339,7 @@ class RadioBrowserSource(RB.StreamingSource):
         data = self.load_from_file(os.path.join(self.cache_dir,BOOKMARKS_FILENAME))
         if data is None:
             data = {}
-        for name,station in data.items():
+        for name,station in list(data.items()):
             self.tree_store.append(self.bookmarks_iter,(name,station))
 
         # initialize genre dict for genre filter combobox
@@ -1349,13 +1349,13 @@ class RadioBrowserSource(RB.StreamingSource):
             try:
                 self.station_actions[feed.name()] = feed.get_station_actions()
                 self.insert_feed(feed,None)
-            except Exception,e:
-                print "error with source:"+feed.name()
-                print "error:"+str(e)
+            except Exception as e:
+                print("error with source:"+feed.name())
+                print("error:"+str(e))
 
         self.genre_liststore = Gtk.ListStore(GObject.TYPE_STRING)
         self.genre_liststore.append(("",))
-        for key in self.genre_list.keys():
+        for key in list(self.genre_list.keys()):
             self.genre_liststore.append((key,))
         self.genre_liststore.set_sort_column_id(0,Gtk.SortType.ASCENDING)
         completion = Gtk.EntryCompletion()
@@ -1368,45 +1368,45 @@ class RadioBrowserSource(RB.StreamingSource):
         self.icon_view_store.set_sort_column_id(0,Gtk.SortType.ASCENDING)
 
         # connect model to view
-        print "connect filter to view"
+        print("connect filter to view")
         self.filtered_icon_view_store = self.icon_view_store.filter_new()
         self.filtered_icon_view_store.set_visible_func(self.list_store_visible_func)
         Gdk.threads_enter() #dm
         self.tree_view.set_model(self.sorted_list_store)
         self.icon_view.set_model(self.filtered_icon_view_store)
-        print "filter set model to tree and icon views"
+        print("filter set model to tree and icon views")
 
         #Gdk.threads_enter()
         self.updating = False
         self.notify_status_changed()
         Gdk.threads_leave()
 
-        print "refill list worker"
+        print("refill list worker")
 
     def refill_list(self):
-        print "refill list"
+        print("refill list")
         self.list_download_thread = threading.Thread(target = self.refill_list_worker)
         self.list_download_thread.setDaemon(True)
         self.list_download_thread.start()
 
     def load_from_file(self,filename):
-        print "load_from_file"
+        print("load_from_file")
         if not os.path.isfile(filename):
             return None
 
         try:
-            f = open(filename,"r")
+            f = open(filename,"rb")
             p = pickle.Unpickler(f)
             data = p.load()
             f.close()
             return data
         except:
-            print "load file did not work:"+filename
+            print("load file did not work:"+filename)
             return None
 
     def save_to_file(self,filename,obj):
-        print "save_to_file"
-        f = open(filename,"w")
+        print("save_to_file")
+        f = open(filename,"wb")
         p = pickle.Pickler(f)
         p.dump(obj)
         f.close()
