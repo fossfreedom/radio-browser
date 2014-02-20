@@ -1180,7 +1180,6 @@ class RadioBrowserSource(RB.StreamingSource):
         return icon
 
     def insert_feed(self,feed,parent):
-        print("insert_feed")
         # preload most used icons
         note_icon = self.load_icon_file(rb.find_plugin_file(self.plugin, "note.png"),None)
         shoutcast_icon = self.load_icon_file(rb.find_plugin_file(self.plugin, "shoutcast-logo.png"),None)

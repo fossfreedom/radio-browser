@@ -84,6 +84,7 @@ class Feed:
 
             while True:
                 chunk = remotefile.read(chunksize)
+                chunk = chunk.decode('latin-1')
                 current += chunksize
                 self.copy_callback(current,self.FileSize)
                 if chunk == "":
@@ -92,8 +93,8 @@ class Feed:
                     break
                 data += chunk
 
-            localfile = open(self.filename,"w")
-            localfile.write(data)
+            localfile = open(self.filename, 'at', encoding='utf8')
+            localfile.write(data + '\n')
             localfile.close()
         except Exception as e:
             print("download failed exception")
@@ -214,7 +215,7 @@ class Feed:
             current = 0
 
             while True:
-                chunk = remotefile.read(chunksize)
+                chunk = remotefile.read(chunksize).decode('utf-8')
                 current += chunksize
                 if chunk == "":
                     break
