@@ -252,7 +252,7 @@ class RadioBrowserSource(RB.StreamingSource):
         yield FeedIcecast(self.cache_dir,self.update_download_status)
         yield FeedBoard(self.cache_dir, self.update_download_status)
         #yield FeedShoutcast(self.cache_dir,self.update_download_status)
-        yield FeedRadioTime(self.cache_dir,self.update_download_status)
+        #yield FeedRadioTime(self.cache_dir,self.update_download_status)
 
     def doSearch(self, term):
         print("doSearch")
@@ -323,7 +323,6 @@ class RadioBrowserSource(RB.StreamingSource):
         self.refill_statistics(thread=True)
 
     def shortStr(self, longstring, maxlen):
-        print("shortStr")
         if len(longstring) > maxlen:
             short_value = longstring[0:maxlen - 3] + "..."
         else:
@@ -467,7 +466,7 @@ class RadioBrowserSource(RB.StreamingSource):
 
                 try:
                     if station.icon_src != "":
-                        hash_src = hashlib.md5(station.icon_src).hexdigest()
+                        hash_src = hashlib.md5(station.icon_src.encode('utf-8')).hexdigest()
                         filepath = os.path.join(self.icon_cache_dir, hash_src)
                         if os.path.exists(filepath):
                             buffer = Pixbuf.new_from_file_at_size(filepath, width, height)
@@ -525,7 +524,7 @@ class RadioBrowserSource(RB.StreamingSource):
 
             try:
                 if station.icon_src != "":
-                    hash_src = hashlib.md5(station.icon_src).hexdigest()
+                    hash_src = hashlib.md5(station.icon_src.encode('utf-8')).hexdigest()
                     filepath = os.path.join(self.icon_cache_dir, hash_src)
                     if os.path.exists(filepath):
                         buffer = Pixbuf.new_from_file_at_size(filepath, width, height)
@@ -791,7 +790,6 @@ class RadioBrowserSource(RB.StreamingSource):
     """ tries to load icon from disk and if found it saves it in cache returns it """
 
     def get_icon_pixbuf(self, filepath, return_value_not_found=None):
-        print("get_icon_pixbuf")
         if os.path.exists(filepath):
             icon = None
 
@@ -811,7 +809,6 @@ class RadioBrowserSource(RB.StreamingSource):
     """ data display function for tree view """
 
     def model_data_func(self, column, cell, model, iter, infostr):
-        print("model_data_func")
         obj = model.get_value(iter, 1)
         self.clef_icon = self.get_icon_pixbuf(rb.find_plugin_file(self.plugin, "note.png"))
 
@@ -832,7 +829,7 @@ class RadioBrowserSource(RB.StreamingSource):
 
                 # most special icons, if the station has one for itsself
                 if station.icon_src != "":
-                    hash_src = hashlib.md5(station.icon_src).hexdigest()
+                    hash_src = hashlib.md5(station.icon_src.encode('utf-8')).hexdigest()
                     filepath = os.path.join(self.icon_cache_dir, hash_src)
                     if os.path.exists(filepath):
                         icon = self.get_icon_pixbuf(filepath, icon)
@@ -1172,8 +1169,8 @@ class RadioBrowserSource(RB.StreamingSource):
         yield FeedIcecast(self.cache_dir,self.update_download_status)
         yield FeedBoard(self.cache_dir, self.update_download_status)
         #yield FeedShoutcast(self.cache_dir,self.update_download_status)
-        yield FeedRadioTime(self.cache_dir,self.update_download_status)
-        yield FeedRadioTimeLocal(self.cache_dir,self.update_download_status)
+        #yield FeedRadioTime(self.cache_dir,self.update_download_status)
+        #yield FeedRadioTimeLocal(self.cache_dir,self.update_download_status)
 
     def get_stock_icon(self, name):
         #print "get_stock_icon"
@@ -1197,7 +1194,7 @@ class RadioBrowserSource(RB.StreamingSource):
         # most special icons, if the station has one for itself
         if station.icon_src != "":
             if station.icon_src is not None:
-                hash_src = hashlib.md5(station.icon_src).hexdigest()
+                hash_src = hashlib.md5(station.icon_src.encode('utf-8')).hexdigest()
                 filepath = os.path.join(self.icon_cache_dir, hash_src)
                 if os.path.exists(filepath):
                     icon = self.load_icon_file(filepath, icon)
@@ -1251,6 +1248,8 @@ class RadioBrowserSource(RB.StreamingSource):
 
         stations_count = 0
 
+        print ("###################")
+        print (len(entries))
         for obj in entries:
             if isinstance(obj, Feed):
                 sub_feed = obj
