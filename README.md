@@ -4,9 +4,7 @@ Radio-Browser
 GTK3+ port from original source https://github.com/segler-alex/rhythmbox-radio-browser/issues
 for Rhythmbox 2.96 - 2.99.1
 
-NOTE: For Rhythmbox 3.0 and above use the RB3 branch - see also the following for current issues:
-
- - https://github.com/fossfreedom/radio-browser/issues/4
+NOTE: For Rhythmbox 3.0 and above use the RB3 branch
 
 ##GTK3 Author
 
