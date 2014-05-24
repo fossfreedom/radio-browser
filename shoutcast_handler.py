@@ -23,12 +23,13 @@ import xml.sax.handler
 from radio_station import RadioStation
 from feed import Feed
 
+
 class ShoutcastRadioStation(RadioStation):
     def updateRealURL(self):
         self.listen_urls = []
         try:
             # download from "http://www.shoutcast.com"+self.tunein+"?id="+shoutcast_id
-            url = "http://www.shoutcast.com"+self.tunein+"?id="+self.listen_id
+            url = "http://www.shoutcast.com" + self.tunein + "?id=" + self.listen_id
             remote = urllib.request.urlopen(url)
             data = remote.read()
             remote.close()
@@ -37,10 +38,11 @@ class ShoutcastRadioStation(RadioStation):
             for line in lines:
                 if line.startswith("File"):
                     self.listen_urls.append(line.split("=")[1])
-                    print("new link:"+line.split("=")[1])
+                    print("new link:" + line.split("=")[1])
             self.askUserAboutUrls()
         except:
             return
+
     def getRealURL(self):
         if self.listen_url == "":
             self.updateRealURL()
@@ -49,11 +51,12 @@ class ShoutcastRadioStation(RadioStation):
         else:
             return self.listen_url
 
+
 class ShoutcastHandler(xml.sax.handler.ContentHandler):
     def __init__(self):
         self.genres = []
         self.entries = []
- 
+
     def startElement(self, name, attributes):
         if name == "genre":
             self.genres.append(attributes.get("name"))
@@ -72,13 +75,15 @@ class ShoutcastHandler(xml.sax.handler.ContentHandler):
             self.entry.listeners = attributes.get("lc")
             self.entry.server_type = attributes.get("mt")
             try:
-                self.entry.homepage = "http://shoutcast.com/directory/search_results.jsp?searchCrit=simple&s="+urllib.parse.quote_plus(self.entry.server_name.replace("- [SHOUTcast.com]","").strip())
+                self.entry.homepage = "http://shoutcast.com/directory/search_results.jsp?searchCrit=simple&s=" + urllib.parse.quote_plus(
+                    self.entry.server_name.replace("- [SHOUTcast.com]", "").strip())
             except:
                 self.entry.homepage = ""
             self.entries.append(self.entry)
 
+
 class FeedShoutcast(Feed):
-    def __init__(self,cache_dir,status_change_handler):
+    def __init__(self, cache_dir, status_change_handler):
         Feed.__init__(self)
         print("init shoutcast feed")
         self.handler = ShoutcastHandler()
@@ -106,35 +111,36 @@ class FeedShoutcast(Feed):
         entry_list = []
         genres = self.genres()
         for genre in genres:
-            entry = FeedSubShoutcast(self.cache_dir,self.status_change_handler,genre)
+            entry = FeedSubShoutcast(self.cache_dir, self.status_change_handler, genre)
             entry_list.append(entry)
 
         return entry_list
 
-    def search(self,term):
-        searchUrl = "http://www.shoutcast.com/sbin/newxml.phtml?%s" % urllib.parse.urlencode({"search":term})
+    def search(self, term):
+        searchUrl = "http://www.shoutcast.com/sbin/newxml.phtml?%s" % urllib.parse.urlencode({"search": term})
         data = self.downloadFile(searchUrl)
         handler = ShoutcastHandler()
         if data != None:
-            xml.sax.parseString(data,handler)
+            xml.sax.parseString(data, handler)
             return handler.entries
 
         return None
 
+
 class FeedSubShoutcast(Feed):
-    def __init__(self,cache_dir,status_change_handler,genre):
+    def __init__(self, cache_dir, status_change_handler, genre):
         Feed.__init__(self)
         self.handler = ShoutcastHandler()
         self.cache_dir = cache_dir
-        self.filename = os.path.join(self.cache_dir, "shoutcast-"+genre+".xml")
-        self.uri = "http://www.shoutcast.com/sbin/newxml.phtml?%s" % urllib.parse.urlencode({"genre":genre})
+        self.filename = os.path.join(self.cache_dir, "shoutcast-" + genre + ".xml")
+        self.uri = "http://www.shoutcast.com/sbin/newxml.phtml?%s" % urllib.parse.urlencode({"genre": genre})
         self.status_change_handler = status_change_handler
         self.genre = genre
         self.setAutoDownload(False)
         self.setUpdateChecking(False)
 
     def name(self):
-        return "Shoutcast Genre "+self.genre
+        return "Shoutcast Genre " + self.genre
 
     def getHomepage(self):
         return "http://shoutcast.com/"

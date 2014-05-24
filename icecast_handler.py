@@ -21,19 +21,20 @@ import xml.sax.handler
 from radio_station import RadioStation
 from feed import Feed
 
+
 class IcecastHandler(xml.sax.handler.ContentHandler):
     def __init__(self):
         self.entries = []
- 
+
     def startElement(self, name, attributes):
         self.currentEntry = name;
         if name == "entry":
             self.entry = RadioStation()
             self.entry.type = "Icecast"
- 
+
     def characters(self, data):
         if self.currentEntry == "server_name":
-            self.entry.server_name += data  
+            self.entry.server_name += data
         elif self.currentEntry == "listen_url":
             self.entry.listen_url += data
         elif self.currentEntry == "genre":
@@ -44,11 +45,12 @@ class IcecastHandler(xml.sax.handler.ContentHandler):
             self.entry.bitrate += data
         elif self.currentEntry == "server_type":
             self.entry.server_type += data
- 
+
     def endElement(self, name):
         if name == "entry":
             try:
-                self.entry.homepage = "http://dir.xiph.org/search?search="+urllib.parse.quote_plus(self.entry.server_name)
+                self.entry.homepage = "http://dir.xiph.org/search?search=" + urllib.parse.quote_plus(
+                    self.entry.server_name)
             except:
                 self.entry.homepage = ""
             self.entry.genre = ",".join(self.entry.genre.split(" "))
@@ -56,8 +58,9 @@ class IcecastHandler(xml.sax.handler.ContentHandler):
 
         self.currentEntry = ""
 
+
 class FeedIcecast(Feed):
-    def __init__(self,cache_dir,status_change_handler):
+    def __init__(self, cache_dir, status_change_handler):
         Feed.__init__(self)
         print("init icecast feed")
         self.handler = IcecastHandler()

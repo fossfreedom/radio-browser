@@ -25,23 +25,26 @@ import xml.sax.handler
 
 from radio_station import RadioStation
 
+
 class FeedAction:
-    def __init__(self,feed,name,func):
+    def __init__(self, feed, name, func):
         self.feed = feed
         self.name = name
         self.func = func
 
-    def call(self,source):
+    def call(self, source):
         self.func(source)
 
+
 class FeedStationAction:
-    def __init__(self,feed,name,func):
+    def __init__(self, feed, name, func):
         self.feed = feed
         self.name = name
         self.func = func
 
-    def call(self,source,station):
-        self.func(source,station)
+    def call(self, source, station):
+        self.func(source, station)
+
 
 class Feed:
     def __init__(self):
@@ -60,17 +63,17 @@ class Feed:
     def getHomepage(self):
         return ""
 
-    def setAutoDownload(self,autodownload):
+    def setAutoDownload(self, autodownload):
         self.AutoDownload = autodownload
 
-    def setUpdateChecking(self,updatechecking):
+    def setUpdateChecking(self, updatechecking):
         self.UpdateChecking = updatechecking
 
-    def copy_callback(self,current,total):
-        self.status_change_handler(self.uri,current,total)
+    def copy_callback(self, current, total):
+        self.status_change_handler(self.uri, current, total)
 
     def download(self):
-        print("downloading "+self.uri)
+        print("downloading " + self.uri)
         try:
             os.remove(self.filename)
         except:
@@ -86,7 +89,7 @@ class Feed:
                 chunk = remotefile.read(chunksize)
                 chunk = chunk.decode('latin-1')
                 current += chunksize
-                self.copy_callback(current,self.FileSize)
+                self.copy_callback(current, self.FileSize)
                 if chunk == "":
                     break
                 if chunk == None:
@@ -108,18 +111,18 @@ class Feed:
             conn = http.client.HTTPConnection(urlparts.netloc)
             conn.request("HEAD", urlparts.path)
             res = conn.getresponse()
-            for key,value in res.getheaders():
+            for key, value in res.getheaders():
                 if key == "last-modified":
-                    print(key+":"+value)
+                    print(key + ":" + value)
                     oldlocale = locale.setlocale(locale.LC_ALL)
-                    locale.setlocale(locale.LC_ALL,"C")
-                    self.remote_mod = datetime.datetime.strptime(value,'%a, %d %b %Y %H:%M:%S %Z')
-                    locale.setlocale(locale.LC_ALL,oldlocale)
+                    locale.setlocale(locale.LC_ALL, "C")
+                    self.remote_mod = datetime.datetime.strptime(value, '%a, %d %b %Y %H:%M:%S %Z')
+                    locale.setlocale(locale.LC_ALL, oldlocale)
                 if key == "content-length":
-                    print(key+":"+value)
+                    print(key + ":" + value)
                     self.FileSize = int(value)
         except Exception as e:
-            print("could not check remote file for modification time:"+self.uri)
+            print("could not check remote file for modification time:" + self.uri)
             print(e)
             return
 
@@ -131,13 +134,13 @@ class Feed:
         try:
             local_mod = datetime.datetime.fromtimestamp(os.path.getmtime(self.filename))
         except:
-            print("could not load local file:"+self.filename)
+            print("could not load local file:" + self.filename)
             download = True
 
         self.getRemoteFileInfo()
-        
+
         if self.remote_mod > local_mod:
-            print("Local file older than 1 day: remote("+str(self.remote_mod)+") local("+str(local_mod)+")")
+            print("Local file older than 1 day: remote(" + str(self.remote_mod) + ") local(" + str(local_mod) + ")")
             # change date is different -> download
             download = True
 
@@ -145,11 +148,11 @@ class Feed:
             self.download()
 
     def load(self):
-        print("loading "+self.filename)
+        print("loading " + self.filename)
         try:
-            xml.sax.parse(self.filename,self.handler)
+            xml.sax.parse(self.filename, self.handler)
         except:
-            print("parse failed of "+self.filename)
+            print("parse failed of " + self.filename)
 
     def genres(self):
         if not os.path.isfile(self.filename) and not self.AutoDownload:
@@ -159,7 +162,7 @@ class Feed:
             if self.UpdateChecking:
                 self.update()
             if not os.path.isfile(self.filename):
-                self.download() #was just download()
+                self.download()  #was just download()
             self.load()
             self.loaded = True
 
@@ -180,7 +183,7 @@ class Feed:
             if self.UpdateChecking:
                 self.update()
             if not os.path.isfile(self.filename):
-                self.download() #was just download()
+                self.download()  #was just download()
             self.load()
             self.loaded = True
 
@@ -207,7 +210,7 @@ class Feed:
     #   print "not implemented in this feed"
     #   return None
 
-    def downloadFile(self,url):
+    def downloadFile(self, url):
         try:
             remotefile = urllib.request.urlopen(url)
             chunksize = 100

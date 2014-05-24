@@ -23,12 +23,13 @@ import xml.sax.handler
 from radio_station import RadioStation
 from feed import Feed
 
+
 class RadioTimeRadioStation(RadioStation):
     def updateRealURL(self):
         self.listen_urls = []
         try:
-            url = "http://opml.radiotime.com/Tune.ashx?id="+self.listen_id
-            print("tunein:"+url)
+            url = "http://opml.radiotime.com/Tune.ashx?id=" + self.listen_id
+            print("tunein:" + url)
             remote = urllib.request.urlopen(url)
             data = remote.read()
             remote.close()
@@ -37,7 +38,7 @@ class RadioTimeRadioStation(RadioStation):
             for line in lines:
                 if not line.startswith("#"):
                     self.listen_urls.append(line)
-                    print("new link:"+line)
+                    print("new link:" + line)
             self.askUserAboutUrls()
 
         except:
@@ -51,11 +52,12 @@ class RadioTimeRadioStation(RadioStation):
         else:
             return self.listen_url
 
+
 class RadioTimeHandler(xml.sax.handler.ContentHandler):
     def __init__(self):
         self.genres = {}
         self.entries = []
- 
+
     def startElement(self, name, attributes):
         if name == "outline":
             if attributes.get("type") == "audio":
@@ -73,10 +75,10 @@ class RadioTimeHandler(xml.sax.handler.ContentHandler):
                 self.entries.append(self.entry)
             if attributes.get("type") == "link":
                 try:
-                    self.entry = FeedRadioTime(self.cache_dir,self.status_change_handler)
+                    self.entry = FeedRadioTime(self.cache_dir, self.status_change_handler)
                     self.entry.uri = attributes.get("URL")
                     self.entry._name = attributes.get("text")
-                    self.entry.filename = os.path.join(self.cache_dir,"radiotime-%s.xml" % attributes.get("guide_id"))
+                    self.entry.filename = os.path.join(self.cache_dir, "radiotime-%s.xml" % attributes.get("guide_id"))
                     self.entry.setAutoDownload(False)
                     self.entries.append(self.entry)
                 except:
@@ -84,10 +86,12 @@ class RadioTimeHandler(xml.sax.handler.ContentHandler):
             if attributes.get("type") == "text":
                 self.genres[attributes.get("guide_id")] = attributes.get("text")
 
+
 RadioTimeGenreList = None
 
+
 class FeedRadioTime(Feed):
-    def __init__(self,cache_dir,status_change_handler):
+    def __init__(self, cache_dir, status_change_handler):
         Feed.__init__(self)
         self.handler = RadioTimeHandler()
         self.handler.cache_dir = cache_dir
@@ -95,7 +99,8 @@ class FeedRadioTime(Feed):
         self.cache_dir = cache_dir
         self.status_change_handler = status_change_handler
         self.filename = os.path.join(self.cache_dir, "radiotime.xml")
-        self.uri = "http://opml.radiotime.com/Browse.ashx?%s" % urllib.parse.urlencode({"id":"r0","formats":"ogg,mp3,aac,wma"})
+        self.uri = "http://opml.radiotime.com/Browse.ashx?%s" % urllib.parse.urlencode(
+            {"id": "r0", "formats": "ogg,mp3,aac,wma"})
         self._name = "RadioTime"
         self.setUpdateChecking(False)
 
@@ -117,10 +122,10 @@ class FeedRadioTime(Feed):
             return
 
         try:
-            xml.sax.parseString(xmlData,handler)
+            xml.sax.parseString(xmlData, handler)
             RadioTimeGenreList = handler.genres
         except:
-            print("parse failed of "+xmlData)
+            print("parse failed of " + xmlData)
 
     def entries(self):
         items = Feed.entries(self)
@@ -128,7 +133,7 @@ class FeedRadioTime(Feed):
             self.loadGenreList()
 
         for item in items:
-            if isinstance(item,RadioTimeRadioStation):
+            if isinstance(item, RadioTimeRadioStation):
                 #print "search for '"+item.genre_id+"'"
                 if item.genre_id in RadioTimeGenreList:
                     #print "found it!"
@@ -142,20 +147,23 @@ class FeedRadioTime(Feed):
     def getHomepage(self):
         return "http://radiotime.com/"
 
-    def search(self,term):
-        searchUrl = "http://opml.radiotime.com/Search.ashx?%s" % urllib.parse.urlencode({"query":term,"formats":"ogg,mp3,aac,wma"})
-        print(("url:"+searchUrl))
+    def search(self, term):
+        searchUrl = "http://opml.radiotime.com/Search.ashx?%s" % urllib.parse.urlencode(
+            {"query": term, "formats": "ogg,mp3,aac,wma"})
+        print(("url:" + searchUrl))
         data = self.downloadFile(searchUrl)
         handler = RadioTimeHandler()
         if data != None:
-            xml.sax.parseString(data,handler)
+            xml.sax.parseString(data, handler)
             return handler.entries
 
         return None
 
+
 class FeedRadioTimeLocal(FeedRadioTime):
-    def __init__(self,cache_dir,status_change_handler):
-        FeedRadioTime.__init__(self,cache_dir,status_change_handler)
-        self.uri = "http://opml.radiotime.com/Browse.ashx?%s" % urllib.parse.urlencode({"c":"local","formats":"ogg,mp3,aac,wma"})
+    def __init__(self, cache_dir, status_change_handler):
+        FeedRadioTime.__init__(self, cache_dir, status_change_handler)
+        self.uri = "http://opml.radiotime.com/Browse.ashx?%s" % urllib.parse.urlencode(
+            {"c": "local", "formats": "ogg,mp3,aac,wma"})
         self._name = "RadioTime Local"
         self.filename = os.path.join(self.cache_dir, "radiotime-local.xml")

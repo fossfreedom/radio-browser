@@ -17,6 +17,7 @@
 
 from gi.repository import Gtk
 
+
 class RadioStation:
     def __init__(self):
         self.listen_url = ""
@@ -60,10 +61,11 @@ class RadioStation:
                 return
 
             Gdk.threads_enter()
-            dialog = Gtk.Dialog(_("Select stream URL please"),flags=Gtk.DIALOG_MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,buttons=(Gtk.STOCK_OK,Gtk.RESPONSE_OK))
+            dialog = Gtk.Dialog(_("Select stream URL please"), flags=Gtk.DIALOG_MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,
+                                buttons=(Gtk.STOCK_OK, Gtk.RESPONSE_OK))
 
             urlListView = Gtk.TreeView()
-            urlListView.append_column(Gtk.TreeViewColumn(_("Url"),Gtk.CellRendererText(),text=0))
+            urlListView.append_column(Gtk.TreeViewColumn(_("Url"), Gtk.CellRendererText(), text=0))
             urlListStore = Gtk.ListStore(str)
             iter = None
             for url in self.listen_urls:
@@ -85,9 +87,9 @@ class RadioStation:
             dialog.hide_all()
 
             (model, iter) = treeselection.get_selected()
-            self.listen_url = model.get_value(iter,0)
+            self.listen_url = model.get_value(iter, 0)
             Gdk.threads_leave()
-            print("choosen link:"+self.listen_url)
+            print("choosen link:" + self.listen_url)
 
         except Exception as e:
             print(e)
