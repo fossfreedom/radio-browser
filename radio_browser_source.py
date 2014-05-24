@@ -249,10 +249,10 @@ class RadioBrowserSource(RB.StreamingSource):
 
     def searchEngines(self):
         print("searchEngines")
-        #yield FeedIcecast(self.cache_dir,self.update_download_status)
+        yield FeedIcecast(self.cache_dir,self.update_download_status)
         yield FeedBoard(self.cache_dir, self.update_download_status)
         #yield FeedShoutcast(self.cache_dir,self.update_download_status)
-        #yield FeedRadioTime(self.cache_dir,self.update_download_status)
+        yield FeedRadioTime(self.cache_dir,self.update_download_status)
 
     def doSearch(self, term):
         print("doSearch")
@@ -1169,11 +1169,11 @@ class RadioBrowserSource(RB.StreamingSource):
 
     def engines(self):
         print("engines")
-        #yield FeedIcecast(self.cache_dir,self.update_download_status)
+        yield FeedIcecast(self.cache_dir,self.update_download_status)
         yield FeedBoard(self.cache_dir, self.update_download_status)
         #yield FeedShoutcast(self.cache_dir,self.update_download_status)
-        #yield FeedRadioTime(self.cache_dir,self.update_download_status)
-        #yield FeedRadioTimeLocal(self.cache_dir,self.update_download_status)
+        yield FeedRadioTime(self.cache_dir,self.update_download_status)
+        yield FeedRadioTimeLocal(self.cache_dir,self.update_download_status)
 
     def get_stock_icon(self, name):
         #print "get_stock_icon"
