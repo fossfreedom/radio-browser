@@ -21,7 +21,7 @@ Installation
 ------------
 
 <pre>
-git clone https://github.com/fossfreedom/radio-browser
+git clone https://github.com/fossfreedom/radio-browser -b rb3
 cd radio-browser
 ./install.sh
 </pre>
@@ -29,7 +29,7 @@ cd radio-browser
 For a system wide install then:
 
 <pre>
-git clone https://github.com/fossfreedom/radio-browser
+git clone https://github.com/fossfreedom/radio-browser -b rb3
 cd radio-browser
 sudo make install
 </pre>
