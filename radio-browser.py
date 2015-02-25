@@ -184,9 +184,12 @@ class RadioBrowserPlugin(GObject.GObject, Peas.Activatable):
         entry_type.category = RB.RhythmDBEntryCategory.STREAM
 
         # load plugin icon
-        theme = Gtk.IconTheme.get_default()
-        rb.append_plugin_source_path(theme, "/icons")
-
+        try:
+            theme = Gtk.IconTheme.get_default()
+            rb.append_plugin_source_path(theme, "/icons")
+        except:
+            rb.append_plugin_source_path(self, "/icons")
+            
         what, width, height = Gtk.icon_size_lookup(Gtk.IconSize.LARGE_TOOLBAR)
         #pxbf = GdkPixbuf.Pixbuf.new_from_file_at_size(rb.find_plugin_file(self, "radio-browser.png"), width, height)
 
