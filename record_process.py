@@ -171,7 +171,7 @@ class RecordProcess(threading.Thread, Gtk.VBox):
         add_label(_("Stream"), self.stream_name)
         add_label(_("Current song"), self.song_info)
         playing_time = datetime.now() - self.song_start
-        add_label(_("Playing time"), "{0:02d}:{1:02d}".format(playing_time.seconds / 60, playing_time.seconds % 60))
+        add_label(_("Playing time"), "{0:02d}:{1:02d}".format(int(playing_time.seconds / 60), playing_time.seconds % 60))
         add_label(_("Filesize"), self.filesize)
         add_label(_("Bitrate"), self.bitrate)
         add_label(_("Relay port"), str(self.relay_port))
@@ -188,6 +188,8 @@ class RecordProcess(threading.Thread, Gtk.VBox):
             while True:
                 try:
                     char = pout.read(1)
+                    print (char)
+                    char = char.decode('UTF-8')
                 except:
                     print("exception")
                     break
@@ -199,9 +201,10 @@ class RecordProcess(threading.Thread, Gtk.VBox):
                     break
                 if char == "\r":
                     break
+                    
                 line = line + char
-
-            #print "STREAMRIPPER:"+line
+                
+            print ("STREAMRIPPER:"+line)
             if line.startswith("relay port"):
                 self.relay_port = line.split(":")[1].strip()
             if line.startswith("stream"):
@@ -223,7 +226,8 @@ class RecordProcess(threading.Thread, Gtk.VBox):
                     self.refillList()
                 self.filesize = line[len(line) - 8:len(line) - 1].strip()
 
-            GObject.idle_add(self.set_info_box)
+            if not line.startswith("Connecting"):
+                GObject.idle_add(self.set_info_box)
 
         print("thread closed")
 
