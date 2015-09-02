@@ -15,8 +15,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with Radio-Browser-Plugin.  If not, see <http://www.gnu.org/licenses/>.
 
-from threading import Thread
-import threading
+#from threading import Thread
+#import threading
 from gi.repository import GObject
 import subprocess
 from gi.repository import Gtk
@@ -29,13 +29,13 @@ import xml.sax.saxutils
 
 from radio_station import RadioStation
 
-GLib.threads_init()
+#GLib.threads_init()
 
 
-class RecordProcess(threading.Thread, Gtk.VBox):
+class RecordProcess(Gtk.VBox):
     def __init__(self, station, outputpath, play_cb, shell):
         # init base classes
-        threading.Thread.__init__(self)
+        #threading.Thread.__init__(self)
         Gtk.VBox.__init__(self)
 
         # make shortcuts
@@ -56,7 +56,7 @@ class RecordProcess(threading.Thread, Gtk.VBox):
         commandline = ["streamripper", uri, "-d", outputpath, "-r", "-o", "larger"]
         print("streamripper commandline")
         print(commandline)
-        self.process = subprocess.Popen(commandline, stdout=subprocess.PIPE)
+        self.process = subprocess.Popen(commandline, shell=False, stdout=subprocess.PIPE)
 
         # infobox
         left = Gtk.Table(12, 2)
@@ -186,13 +186,15 @@ class RecordProcess(threading.Thread, Gtk.VBox):
             line = ""
 
             while True:
-                try:
-                    char = pout.read(1)
-                    print (char)
-                    char = char.decode('UTF-8')
-                except:
-                    print("exception")
-                    break
+                print ("in loop")
+                #try:
+                char=pout.read(1)
+                print ("read")
+                print (char)
+                char = char.decode('UTF-8')
+                #except:
+                #    print("exception")
+                #    break
 
                 if char == None or char == "":
                     break
@@ -204,7 +206,7 @@ class RecordProcess(threading.Thread, Gtk.VBox):
                     
                 line = line + char
                 
-            print ("STREAMRIPPER:"+line)
+            print (line)
             if line.startswith("relay port"):
                 self.relay_port = line.split(":")[1].strip()
             if line.startswith("stream"):
@@ -226,8 +228,7 @@ class RecordProcess(threading.Thread, Gtk.VBox):
                     self.refillList()
                 self.filesize = line[len(line) - 8:len(line) - 1].strip()
 
-            if not line.startswith("Connecting"):
-                GObject.idle_add(self.set_info_box)
+            GObject.idle_add(self.set_info_box)
 
         print("thread closed")
 

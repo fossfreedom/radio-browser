@@ -1068,7 +1068,7 @@ class RadioBrowserSource(RB.StreamingSource):
                     return
             self.recording_streams[uri] = RecordProcess(station, self.plugin.outputpath, self.play_uri, self.shell)
             self.notebook.append_page(self.recording_streams[uri], Gtk.Label(short_name(station.server_name)))
-            self.recording_streams[uri].start()
+            self.recording_streams[uri].run()
             self.notebook.set_current_page(self.notebook.page_num(self.recording_streams[uri]))
         else:
             # get player
