@@ -1,0 +1,17 @@
+<schemalist>
+  <schema id="org.gnome.rhythmbox.plugins.radio-browser" path="/org/gnome/rhythmbox/plugins/radio-browser/">
+
+    <key name="download-trys" type="i">
+        <range min="1" max="10"/>
+        <default>1</default>
+    </key>
+    <key name="recently-played-purge-days" type="i">
+        <range min="1" max="7"/>
+        <default>3</default>
+    </key>
+
+    <key name="outputpath" type="s">
+        <default>''</default>
+    </key>
+  </schema>
+</schemalist>

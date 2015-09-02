@@ -20,7 +20,7 @@ from gi.repository import GObject
 from gi.repository import Peas
 from gi.repository import Gtk
 from gi.repository import GdkPixbuf
-from gi.repository import GConf
+from gi.repository import Gio
 #need package gir1.2-gconf-2.0 to be installed
 from gi.repository import PeasGtk
 from gi.repository import Gio
@@ -32,12 +32,7 @@ from gettext import *
 
 from radio_browser_source import RadioBrowserSource
 
-gconf_keys = {'download_trys': '/apps/rhythmbox/plugins/radio-browser/download_trys',
-              'outputpath': '/apps/rhythmbox/plugins/radio-browser/streamripper_outputpath',
-              'recently_played_purge_days': '/apps/rhythmbox/plugins/radio-browser/recently_played_purge_days'
-}
-
-DIALOG_FILE = 'radio-browser.glade'
+DIALOG_FILE = 'radio-browser.ui'
 DIALOG = 'config_dialog'
 
 
@@ -45,41 +40,33 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
     __type_name__ = 'RadioBrowserConfigDialog'
     object = GObject.property(type=GObject.Object)
 
+    download_trys = GObject.Property(type=int)
+    recently_played_purge_days = GObject.Property(type=int)
+    outputpath = GObject.Property(type=str)
+
     def __init__(self):
         GObject.Object.__init__(self)
-        self.gconf = GConf.Client.get_default()
-
-    def do_create_configure_widget(self):
-
-        #now define some defaults
-        self.download_trys = self.gconf.get_string(gconf_keys['download_trys'])
-        if not self.download_trys:
-            self.download_trys = "3"
-        self.gconf.set_string(gconf_keys['download_trys'], self.download_trys)
-
-        self.recently_played_purge_days = self.gconf.get_string(gconf_keys['recently_played_purge_days'])
-        if not self.recently_played_purge_days:
-            self.recently_played_purge_days = "3"
-        self.gconf.set_string(gconf_keys['recently_played_purge_days'], self.recently_played_purge_days)
-
-        # set the output path of recorded music to xdg standard directory for music
-        self.outputpath = self.gconf.get_string(gconf_keys['outputpath'])
-        if not self.outputpath:
-            self.outputpath = os.path.expanduser("~")
+        self.settings = Gio.Settings("org.gnome.rhythmbox.plugins.radio-browser")
+        self.settings.bind("download-trys",self,"download_trys",Gio.SettingsBindFlags.DEFAULT)
+        self.settings.bind("recently-played-purge-days",self,"recently_played_purge_days",Gio.SettingsBindFlags.DEFAULT)
+        self.settings.bind("outputpath",self,"outputpath",Gio.SettingsBindFlags.DEFAULT)
+        
+        if self.outputpath == "":
+            _outputpath = os.path.expanduser("~")
             # try to read xdg music dir
             try:
-                f = open(self.outputpath + "/.config/user-dirs.dirs", "r")
+                f = open(_outputpath + "/.config/user-dirs.dirs", "r")
             except IOError:
                 print("xdg user dir file not found")
             else:
                 for line in f:
                     if line.startswith("XDG_MUSIC_DIR"):
-                        self.outputpath = os.path.expandvars(line.split("=")[1].strip().strip('"'))
-                        print(self.outputpath)
+                        _outputpath = os.path.expandvars(line.split("=")[1].strip().strip('"'))
+                        print(_outputpath)
                 f.close()
-        self.gconf.set_string(gconf_keys['outputpath'], self.outputpath)
+            self.outputpath=_outputpath
 
-
+    def do_create_configure_widget(self):
         # next define the GUI
         builder = Gtk.Builder()
         file = rb.find_plugin_file(self, DIALOG_FILE)
@@ -117,25 +104,18 @@ class ConfigDialog(GObject.Object, PeasGtk.Configurable):
         filew.destroy()
 
     """ immediately change gconf values in config dialog after user changed download trys """
-
-    def on_spin_download_trys_change_value(self, spin):
-        print("on spin change")
-        self.download_trys = str(self.spin_download_trys.get_value())
-        self.gconf.set_string(gconf_keys['download_trys'], self.download_trys)
+    def on_spin_download_trys_change_value(self,spin):
+        self.download_trys = self.spin_download_trys.get_value_as_int()
 
     """ immediately change gconf values in config dialog after user changed removal days """
-
-    def on_spin_removaltime_change_value(self, spin):
-        print("on removal time change")
-        self.recently_played_purge_days = str(self.spin_removaltime.get_value())
-        self.gconf.set_string(gconf_keys['recently_played_purge_days'], self.recently_played_purge_days)
+    def on_spin_removaltime_change_value(self,spin):
+        self.recently_played_purge_days = self.spin_removaltime.get_value_as_int()
 
     """ immediately change gconf values in config dialog after user changed recorded music output directory """
 
     def on_entry_outputpath_changed(self, entry):
         print("on outputpath change")
         self.outputpath = self.entry_outputpath.get_text()
-        self.gconf.set_string(gconf_keys['outputpath'], self.outputpath)
 
 
 class RadioBrowserEntryType(RB.RhythmDBEntryType):
@@ -147,9 +127,17 @@ class RadioBrowserPlugin(GObject.GObject, Peas.Activatable):
     __gtype_name__ = 'RadioBrowserPlugin'
     object = GObject.Property(type=GObject.GObject)
 
+    download_trys = GObject.Property(type=int)
+    recently_played_purge_days = GObject.Property(type=int)
+    outputpath = GObject.Property(type=str)
+
     def __init__(self):
         super(RadioBrowserPlugin, self).__init__()
-        self.gconf = GConf.Client.get_default()
+
+        self.settings = Gio.Settings("org.gnome.rhythmbox.plugins.radio-browser")
+        self.settings.bind("download-trys",self,"download_trys",Gio.SettingsBindFlags.DEFAULT)
+        self.settings.bind("recently-played-purge-days",self,"recently_played_purge_days",Gio.SettingsBindFlags.DEFAULT)
+        self.settings.bind("outputpath",self,"outputpath",Gio.SettingsBindFlags.DEFAULT)
 
     def action_update_list(self):
         try:
@@ -226,37 +214,6 @@ class RadioBrowserPlugin(GObject.GObject, Peas.Activatable):
         #uim = self.shell.props.ui_manager
         #uim.insert_action_group (self.actiongroup)
         #uim.ensure_update()
-
-        # try reading gconf entries and set default values if not readable
-        self.download_trys = self.gconf.get_string(gconf_keys['download_trys'])
-        #       self.download_trys = None
-        if not self.download_trys:
-            self.download_trys = "3"
-        self.gconf.set_string(gconf_keys['download_trys'], self.download_trys)
-
-        self.recently_played_purge_days = self.gconf.get_string(gconf_keys['recently_played_purge_days'])
-        #       self.recently_played_purge_days = None
-        if not self.recently_played_purge_days:
-            self.recently_played_purge_days = "3"
-        self.gconf.set_string(gconf_keys['recently_played_purge_days'], self.recently_played_purge_days)
-
-        # set the output path of recorded music to xdg standard directory for music
-        self.outputpath = self.gconf.get_string(gconf_keys['outputpath'])
-        #       self.outputpath = None
-        if not self.outputpath:
-            self.outputpath = os.path.expanduser("~")
-            # try to read xdg music dir
-            try:
-                f = open(self.outputpath + "/.config/user-dirs.dirs", "r")
-            except IOError:
-                print("xdg user dir file not found")
-            else:
-                for line in f:
-                    if line.startswith("XDG_MUSIC_DIR"):
-                        self.outputpath = os.path.expandvars(line.split("=")[1].strip().strip('"'))
-                        print(self.outputpath)
-                f.close()
-        self.gconf.set_string(gconf_keys['outputpath'], self.outputpath)
 
     """ build plugin configuration dialog """
 

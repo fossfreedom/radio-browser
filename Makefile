@@ -1,7 +1,8 @@
-DESTDIR=
-SUBDIR=/usr/lib/rhythmbox/plugins/radio-browser/
-DATADIR=/usr/share/rhythmbox/plugins/radio-browser/
-LOCALEDIR=/usr/share/locale/
+DESTDIR=/usr/
+SUBDIR=lib/rhythmbox/plugins/radio-browser/
+DATADIR=share/rhythmbox/plugins/radio-browser/
+LOCALEDIR=share/locale/
+SCHEMADIR=share/glib-2.0/schemas/
 
 all:
 clean:
@@ -10,8 +11,16 @@ clean:
 install:
 	install -d $(DESTDIR)$(SUBDIR)
 	install -d $(DESTDIR)$(DATADIR)
+	install -m 644 radio-browser.gschema.xml $(DESTDIR)$(SCHEMADIR)
 	install -m 644 *.py $(DESTDIR)$(SUBDIR)
 	install -m 644 *.png $(DESTDIR)$(DATADIR)
 	install -m 644 *.ui $(DESTDIR)$(DATADIR)
-	install -m 644 *.glade $(DESTDIR)$(DATADIR)
 	install -m 644 radio-browser.plugin $(DESTDIR)$(SUBDIR)
+
+uninstall:
+	rm $(DESTDIR)$(SCHEMADIR)radio-browser.gschema.xml
+	rm -r $(DESTDIR)$(SUBDIR)
+	rm -r $(DESTDIR)$(DATADIR)
+
+compilescheme:
+	glib-compile-schemas $(DESTDIR)$(SCHEMADIR)

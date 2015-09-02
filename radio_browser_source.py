@@ -50,13 +50,9 @@ from board_handler import BoardHandler
 from radiotime_handler import FeedRadioTime
 from radiotime_handler import FeedRadioTimeLocal
 
-#TODO: should not be defined here, but I don't know where to get it from. HELP: much apreciated
-RB_METADATA_FIELD_TITLE = 0
-RB_METADATA_FIELD_GENRE = 4
-RB_METADATA_FIELD_BITRATE = 20
 BOARD_ROOT = "http://www.radio-browser.info/"
 RECENTLY_USED_FILENAME = "recently2.bin"
-BOOKMARKS_FILENAME = "bookmarks.bin"
+BOOKMARKS_FILENAME = "bookmarks_2.bin"
 
 GLib.threads_init()
 
@@ -200,7 +196,7 @@ class RadioBrowserSource(RB.StreamingSource):
 
             def searchButtonClick(widget):
                 self.doSearch(self.search_entry.get_text())
-
+            self.search_entry.connect("activate", searchButtonClick)
             searchbutton = ui.get_object('searchbutton')
             searchbutton.connect("clicked", searchButtonClick)
 
@@ -343,12 +339,12 @@ class RadioBrowserSource(RB.StreamingSource):
             self.play_uri(station)
 
         def button_add_click(widget, name, station):
-            data = self.load_from_file(os.path.join(self.cache_dir, BOOKMARKS_FILENAME))
+            data = self.load_from_file(os.path.join(RB.user_data_dir(), BOOKMARKS_FILENAME))
             if data is None:
                 data = {}
             if station.server_name not in data:
                 data[station.server_name] = station
-            self.save_to_file(os.path.join(self.cache_dir, BOOKMARKS_FILENAME), data)
+            self.save_to_file(os.path.join(RB.user_data_dir(), BOOKMARKS_FILENAME), data)
 
             self.refill_favourites()
 
@@ -389,22 +385,22 @@ class RadioBrowserSource(RB.StreamingSource):
             self.record_uri(station)
 
         def button_add_click(widget, name, station):
-            data = self.load_from_file(os.path.join(self.cache_dir, BOOKMARKS_FILENAME))
+            data = self.load_from_file(os.path.join(RB.user_data_dir(), BOOKMARKS_FILENAME))
             if data is None:
                 data = {}
             if station.server_name not in data:
                 data[station.server_name] = station
-            self.save_to_file(os.path.join(self.cache_dir, BOOKMARKS_FILENAME), data)
+            self.save_to_file(os.path.join(RB.user_data_dir(), BOOKMARKS_FILENAME), data)
 
             self.refill_favourites()
 
         def button_delete_click(widget, name, station):
-            data = self.load_from_file(os.path.join(self.cache_dir, BOOKMARKS_FILENAME))
+            data = self.load_from_file(os.path.join(RB.user_data_dir(), BOOKMARKS_FILENAME))
             if data is None:
                 data = {}
             if station.server_name in data:
                 del data[station.server_name]
-            self.save_to_file(os.path.join(self.cache_dir, BOOKMARKS_FILENAME), data)
+            self.save_to_file(os.path.join(RB.user_data_dir(), BOOKMARKS_FILENAME), data)
 
             self.refill_favourites()
 
@@ -582,12 +578,12 @@ class RadioBrowserSource(RB.StreamingSource):
         # get selected item
         print("treeview_cursor_changed_handler")
         selection = treeview.get_selection()
-        model, iter = selection.get_selected()
+        model,tree_iter = selection.get_selected()
 
         # if some item is selected
-        if not iter == None:
-            obj = model.get_value(iter, 1)
-            self.update_info_box(obj, info_box)
+        if not tree_iter == None:
+            obj = model.get_value(tree_iter,1)
+            self.update_info_box(obj,info_box)
 
     def update_info_box(self, obj, info_box):
         print("update_info_box")
@@ -680,20 +676,20 @@ class RadioBrowserSource(RB.StreamingSource):
                 data[station.server_name] = station
                 widget.set_label(_("Unbookmark"))
             else:
-                iter = self.tree_store.iter_children(self.bookmarks_iter)
+                tree_iter = self.tree_store.iter_children(self.bookmarks_iter)
                 while True:
-                    title = self.tree_store.get_value(iter, 0)
+                    title = self.tree_store.get_value(tree_iter,0)
 
                     if title == station.server_name:
-                        self.tree_store.remove(iter)
+                        self.tree_store.remove(tree_iter)
                         break
 
-                    iter = self.tree_store.iter_next(iter)
-                    if iter == None:
+                    tree_iter = self.tree_store.iter_next(tree_iter)
+                    if tree_iter == None:
                         break
                 del data[station.server_name]
                 widget.set_label(_("Bookmark"))
-            self.save_to_file(os.path.join(self.cache_dir, BOOKMARKS_FILENAME), data)
+            self.save_to_file(os.path.join(RB.user_data_dir(), BOOKMARKS_FILENAME), data)
 
         def button_record_handler(widget, station):
             self.record_uri(station)
@@ -807,9 +803,9 @@ class RadioBrowserSource(RB.StreamingSource):
         return return_value_not_found
 
     """ data display function for tree view """
-
-    def model_data_func(self, column, cell, model, iter, infostr):
-        obj = model.get_value(iter, 1)
+    def model_data_func(self,column,cell,model,iter2,infostr):
+        print ("model_data_func")
+        obj = model.get_value(iter2,1)
         self.clef_icon = self.get_icon_pixbuf(rb.find_plugin_file(self.plugin, "note.png"))
 
         if infostr == "image":
@@ -863,7 +859,7 @@ class RadioBrowserSource(RB.StreamingSource):
 
     def info_available(self, player, uri, field, value):
         print("info_available")
-        if field == RB_METADATA_FIELD_TITLE:
+        if field == RB.MetaDataField.TITLE:
             self.title = value
             self.set_streaming_title(self.title)
             #transmit_thread = threading.Thread(target = self.transmit_title,args = (value,))
@@ -871,14 +867,14 @@ class RadioBrowserSource(RB.StreamingSource):
             #transmit_thread.start()
             #print "setting title to:"+value
 
-        elif field == RB_METADATA_FIELD_GENRE:
+        elif field == RB.MetaDataField.GENRE:
             self.genre = value
             ## causes warning: RhythmDB-WARNING **: trying to sync properties of non-editable file
             #self.shell.props.db.set(self.entry, rhythmdb.PROP_GENRE, value)
             #self.shell.props.db.commit()
             #print "setting genre to:"+value
 
-        elif field == RB_METADATA_FIELD_BITRATE:
+        elif field == RB.MetaDataField.BITRATE:
             ## causes warning: RhythmDB-WARNING **: trying to sync properties of non-editable file
             #self.shell.props.db.set(self.entry, rhythmdb.PROP_BITRATE, value/1000)
             #self.shell.props.db.commit()
@@ -897,22 +893,19 @@ class RadioBrowserSource(RB.StreamingSource):
         #   def playing_song_property_changed (self, sp, uri, property, old, new):
         #       print "property changed "+str(new)
 
-    def record_uri(self, station):
-        print("record_uri")
-        play_thread = threading.Thread(target=self.play_uri_, args=(station, True))
+    def record_uri(self,station):
+        play_thread = threading.Thread(target = self.play_uri_,args = (station,True))
         play_thread.setDaemon(True)
         play_thread.start()
 
     """ listener for filter entry change """
-
-    def filter_entry_changed(self, Gtk_entry):
-        print("filter_entry_changed")
+    def filter_entry_changed(self,Gtk_entry):
         if self.filter_entry.get_text() == "" and self.filter_entry_genre.get_text() == "":
-            print("entry and genre are empty")
+            print ("entry and genre are empty")
             self.tree_view_container.show()
             self.icon_view_container.hide()
         else:
-            print("entry or genre has a value")
+            print ("entry or genre has a value")
             self.tree_view_container.hide()
             self.icon_view_container.show()
 
@@ -924,14 +917,13 @@ class RadioBrowserSource(RB.StreamingSource):
         self.notify_status_changed()
 
     """ callback for item filtering """
-
-    def list_store_visible_func(self, model, iter, destroy):
+    def list_store_visible_func(self,model,tree_iter,destroy):
         #print "list_store_visible_func"
         # returns true if the row should be visible
         if len(model) == 0:
             return True
-        obj = model.get_value(iter, 1)
-        if isinstance(obj, RadioStation):
+        obj = model.get_value(tree_iter,1)
+        if isinstance(obj,RadioStation):
             station = obj
             try:
                 bitrate = int(station.bitrate)
@@ -1009,14 +1001,14 @@ class RadioBrowserSource(RB.StreamingSource):
 
             Gdk.threads_enter()
             self.load_status = _("downloading station information") + " '" + station.server_name + "', " + _(
-                "Try") + ":" + str(tryno) + "/" + str(math.floor(float(self.plugin.download_trys)))
+                "Try") + ":" + str(tryno) + "/" + str(self.plugin.download_trys)#str(math.floor(float(self.plugin.download_trys)))
             self.load_total_size = 0
             self.notify_status_changed()
             Gdk.threads_leave()
 
             if station.getRealURL() is not None:
                 break
-            if tryno >= float(self.plugin.download_trys):
+            if tryno >= self.plugin.download_trys:   #float(self.plugin.download_trys):
                 Gdk.threads_enter()
                 self.load_status = ""
                 self.updating = False
@@ -1123,7 +1115,6 @@ class RadioBrowserSource(RB.StreamingSource):
             transmit_thread.start()
 
     def download_feed(self, feed):
-        print("download_feed")
         tryno = 0
         self.updating = True
         while True:
@@ -1157,7 +1148,6 @@ class RadioBrowserSource(RB.StreamingSource):
         self.refill_list()
 
     def do_impl_delete_thyself(self):
-        print("do_impl_delete_thyself")
         if self.hasActivated:
             # kill all running records
             for uri in list(self.recording_streams.keys()):
@@ -1165,7 +1155,6 @@ class RadioBrowserSource(RB.StreamingSource):
             self.shell = False
 
     def engines(self):
-        print("engines")
         yield FeedIcecast(self.cache_dir,self.update_download_status)
         yield FeedBoard(self.cache_dir, self.update_download_status)
         #yield FeedShoutcast(self.cache_dir,self.update_download_status)
@@ -1173,12 +1162,10 @@ class RadioBrowserSource(RB.StreamingSource):
         #yield FeedRadioTimeLocal(self.cache_dir,self.update_download_status)
 
     def get_stock_icon(self, name):
-        #print "get_stock_icon"
         theme = Gtk.icon_theme_get_default()
         return theme.load_icon(name, 48, 0)
 
     def load_icon_file(self, filepath, value_not_found):
-        #print "load_icon_file"
         icon = value_not_found
         try:
             icon = Pixbuf.new_from_file_at_size(filepath, 72, 72)
@@ -1248,8 +1235,6 @@ class RadioBrowserSource(RB.StreamingSource):
 
         stations_count = 0
 
-        print ("###################")
-        print (len(entries))
         for obj in entries:
             if isinstance(obj, Feed):
                 sub_feed = obj
@@ -1334,8 +1319,6 @@ class RadioBrowserSource(RB.StreamingSource):
         return stations_count
 
     def refill_list_worker(self):
-        print("refill list worker")
-
         Gdk.threads_enter()  #dm
         self.station_actions = {}
         tree = self.tree_view.set_model(None)
@@ -1399,29 +1382,24 @@ class RadioBrowserSource(RB.StreamingSource):
         self.icon_view_store.set_sort_column_id(0, Gtk.SortType.ASCENDING)
 
         # connect model to view
-        print("connect filter to view")
         self.filtered_icon_view_store = self.icon_view_store.filter_new()
         self.filtered_icon_view_store.set_visible_func(self.list_store_visible_func)
         Gdk.threads_enter()  #dm
         self.tree_view.set_model(self.sorted_list_store)
         self.icon_view.set_model(self.filtered_icon_view_store)
-        print("filter set model to tree and icon views")
 
         #Gdk.threads_enter()
         self.updating = False
         self.notify_status_changed()
         Gdk.threads_leave()
 
-        print("refill list worker")
 
     def refill_list(self):
-        print("refill list")
         self.list_download_thread = threading.Thread(target=self.refill_list_worker)
         self.list_download_thread.setDaemon(True)
         self.list_download_thread.start()
 
     def load_from_file(self, filename):
-        print("load_from_file")
         if not os.path.isfile(filename):
             return None
 
@@ -1436,7 +1414,6 @@ class RadioBrowserSource(RB.StreamingSource):
             return None
 
     def save_to_file(self, filename, obj):
-        print("save_to_file")
         f = open(filename, "wb")
         p = pickle.Pickler(f)
         p.dump(obj)
