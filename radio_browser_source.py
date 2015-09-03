@@ -52,7 +52,7 @@ from radiotime_handler import FeedRadioTimeLocal
 
 BOARD_ROOT = "http://www.radio-browser.info/"
 RECENTLY_USED_FILENAME = "recently2.bin"
-BOOKMARKS_FILENAME = "bookmarks_2.bin"
+BOOKMARKS_FILENAME = "bookmarks2.bin"
 
 GLib.threads_init()
 
@@ -339,12 +339,15 @@ class RadioBrowserSource(RB.StreamingSource):
             self.play_uri(station)
 
         def button_add_click(widget, name, station):
-            data = self.load_from_file(os.path.join(RB.user_data_dir(), BOOKMARKS_FILENAME))
+            print ("button_add_click")
+            data = self.load_from_file(os.path.join(self.cache_dir, BOOKMARKS_FILENAME))
             if data is None:
                 data = {}
+                
             if station.server_name not in data:
                 data[station.server_name] = station
-            self.save_to_file(os.path.join(RB.user_data_dir(), BOOKMARKS_FILENAME), data)
+                
+            self.save_to_file(os.path.join(self.cache_dir, BOOKMARKS_FILENAME), data)
 
             self.refill_favourites()
 
@@ -380,27 +383,31 @@ class RadioBrowserSource(RB.StreamingSource):
 
         def button_click(widget, name, station):
             self.play_uri(station)
+            print ("2")
 
         def button_record_click(widget, name, station):
             self.record_uri(station)
+            print ("1")
 
         def button_add_click(widget, name, station):
-            data = self.load_from_file(os.path.join(RB.user_data_dir(), BOOKMARKS_FILENAME))
+            data = self.load_from_file(os.path.join(self.cache_dir, BOOKMARKS_FILENAME))
+            print (data)
             if data is None:
                 data = {}
             if station.server_name not in data:
                 data[station.server_name] = station
-            self.save_to_file(os.path.join(RB.user_data_dir(), BOOKMARKS_FILENAME), data)
+            self.save_to_file(os.path.join(self.cache_dir, BOOKMARKS_FILENAME), data)
 
             self.refill_favourites()
+            print ("3")
 
         def button_delete_click(widget, name, station):
-            data = self.load_from_file(os.path.join(RB.user_data_dir(), BOOKMARKS_FILENAME))
+            data = self.load_from_file(os.path.join(self.cache_dir, BOOKMARKS_FILENAME))
             if data is None:
                 data = {}
             if station.server_name in data:
                 del data[station.server_name]
-            self.save_to_file(os.path.join(RB.user_data_dir(), BOOKMARKS_FILENAME), data)
+            self.save_to_file(os.path.join(self.cache_dir, BOOKMARKS_FILENAME), data)
 
             self.refill_favourites()
 
@@ -491,7 +498,9 @@ class RadioBrowserSource(RB.StreamingSource):
         if data is None:
             data = {}
         sortedkeys = sorted(data.keys())
+        print (sortedkeys)
         for name in sortedkeys:
+            print (name)
             line = Gtk.HBox()
             station = data[name]
             if len(name) > 53:
@@ -689,7 +698,7 @@ class RadioBrowserSource(RB.StreamingSource):
                         break
                 del data[station.server_name]
                 widget.set_label(_("Bookmark"))
-            self.save_to_file(os.path.join(RB.user_data_dir(), BOOKMARKS_FILENAME), data)
+            self.save_to_file(os.path.join(self.cache_dir, BOOKMARKS_FILENAME), data)
 
         def button_record_handler(widget, station):
             self.record_uri(station)
@@ -884,14 +893,6 @@ class RadioBrowserSource(RB.StreamingSource):
         else:
             print("Server sent unknown info '" + str(field) + "':'" + str(value) + "'")
 
-        #   def playing_changed (self, sp, playing):
-        #       print "playing changed"
-
-        #   def playing_entry_changed (self, sp, entry):
-        #       print "playing entry changed"
-
-        #   def playing_song_property_changed (self, sp, uri, property, old, new):
-        #       print "property changed "+str(new)
 
     def record_uri(self,station):
         play_thread = threading.Thread(target = self.play_uri_,args = (station,True))
@@ -1401,8 +1402,11 @@ class RadioBrowserSource(RB.StreamingSource):
 
     def load_from_file(self, filename):
         if not os.path.isfile(filename):
+            print ("not found")
+            print (filename)
             return None
 
+        print (filename)
         try:
             f = open(filename, "rb")
             p = pickle.Unpickler(f)
@@ -1414,6 +1418,8 @@ class RadioBrowserSource(RB.StreamingSource):
             return None
 
     def save_to_file(self, filename, obj):
+        print (filename)
+        print (obj)
         f = open(filename, "wb")
         p = pickle.Pickler(f)
         p.dump(obj)
