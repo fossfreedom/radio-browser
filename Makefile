@@ -1,8 +1,8 @@
-DESTDIR=/usr/
-SUBDIR=lib/rhythmbox/plugins/radio-browser/
-DATADIR=share/rhythmbox/plugins/radio-browser/
-LOCALEDIR=share/locale/
-SCHEMADIR=share/glib-2.0/schemas/
+DESTDIR=
+SUBDIR=/usr/lib/rhythmbox/plugins/radio-browser/
+DATADIR=/usr/share/rhythmbox/plugins/radio-browser/
+LOCALEDIR=/usr/share/locale/
+SCHEMADIR=/usr/share/glib-2.0/schemas/
 
 all:
 clean:
