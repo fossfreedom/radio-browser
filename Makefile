@@ -11,6 +11,7 @@ clean:
 install:
 	install -d $(DESTDIR)$(SUBDIR)
 	install -d $(DESTDIR)$(DATADIR)
+	install -d $(DESTDIR)$(SCHEMADIR)
 	install -m 644 schema/org.gnome.rhythmbox.plugins.radio-browser.gschema.xml $(DESTDIR)$(SCHEMADIR)
 	install -m 644 *.py $(DESTDIR)$(SUBDIR)
 	install -m 644 *.png $(DESTDIR)$(DATADIR)
