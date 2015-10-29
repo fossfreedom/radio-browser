@@ -60,16 +60,15 @@ class BoardHandler(xml.sax.handler.ContentHandler):
             if self.entry.language.title() not in self.languages:
                 self.languages.append(self.entry.language.title())
 
-
 class PostStationDialog(Gtk.Dialog):
     def __init__(self):
         super(PostStationDialog, self).__init__()
 
         title_label = Gtk.Label()
         title_label.set_markup("<span font='20.0'>" + _("Post new station") + "</span>")
-        self.get_content_area().pack_start(title_label)
-        self.add_button(Gtk.STOCK_CANCEL, Gtk.RESPONSE_CANCEL)
-        self.add_button(Gtk.STOCK_OK, Gtk.RESPONSE_OK)
+        self.get_content_area().pack_start(title_label, False, False, 0)
+        self.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
+        self.add_button(Gtk.STOCK_OK, Gtk.ResponseType.OK)
 
         table = Gtk.Table(3, 8)
 
@@ -96,12 +95,14 @@ class PostStationDialog(Gtk.Dialog):
         table.attach(Gtk.Label(_("http://very.cool.site/favicon.ico")), 2, 3, 4, 5)
 
         table.attach(Gtk.Label(_("Country")), 0, 1, 5, 6)
-        self.StationCountry = Gtk.ComboBoxEntry()
+        self.StationCountry = Gtk.ComboBoxText.new_with_entry()
+        #self.StationCountry.set_hexpand(True)
         table.attach(self.StationCountry, 1, 2, 5, 6)
         table.attach(Gtk.Label(_("Utopia")), 2, 3, 5, 6)
 
         table.attach(Gtk.Label(_("Language")), 0, 1, 6, 7)
-        self.StationLanguage = Gtk.ComboBoxEntry()
+        self.StationLanguage = Gtk.ComboBoxText.new_with_entry()
+        #self.StationLanguage.set_hexpand(True)
         table.attach(self.StationLanguage, 1, 2, 6, 7)
         table.attach(Gtk.Label(_("Esperanto")), 2, 3, 6, 7)
 
@@ -110,11 +111,11 @@ class PostStationDialog(Gtk.Dialog):
         table.attach(self.StationTags, 1, 2, 7, 8)
         table.attach(Gtk.Label(_("Classical Jazz Talk")), 2, 3, 7, 8)
 
-        self.get_content_area().pack_start(table, False)
+        self.get_content_area().pack_start(table, False, False, 0)
 
         self.set_title(_("Post new station"))
         self.set_resizable(False)
-        self.set_position(Gtk.WIN_POS_CENTER)
+        self.set_position(Gtk.WindowPosition.CENTER)
         self.show_all()
 
 
@@ -149,12 +150,12 @@ class FeedBoard(Feed):
     """ vote for station on board """
 
     def vote_station(self, source, station):
-        message = Gtk.MessageDialog(message_format=_("Vote for station"), buttons=Gtk.BUTTONS_YES_NO,
-                                    type=Gtk.MESSAGE_QUESTION)
+        message = Gtk.MessageDialog(message_format=_("Vote for station"), buttons=Gtk.ButtonsType.YES_NO,
+                                    type=Gtk.MessageType.QUESTION)
         message.format_secondary_text(_(
             "Do you really want to vote for this station? It means, that you like it, and you want more people to know, that this is a good station."))
         response = message.run()
-        if response == Gtk.RESPONSE_YES:
+        if response == Gtk.ResponseType.YES:
             params = urllib.parse.urlencode({'action': 'vote', 'id': station.id})
             f = urllib.request.urlopen("http://www.radio-browser.info/?%s" % params)
             f.read()
@@ -164,12 +165,12 @@ class FeedBoard(Feed):
     """ mark station as bad on board """
 
     def bad_station(self, source, station):
-        message = Gtk.MessageDialog(message_format=_("Mark station as broken"), buttons=Gtk.BUTTONS_YES_NO,
-                                    type=Gtk.MESSAGE_WARNING)
+        message = Gtk.MessageDialog(message_format=_("Mark station as broken"), buttons=Gtk.ButtonsType.YES_NO,
+                                    type=Gtk.MessageType.WARNING)
         message.format_secondary_text(_(
             "Do you really want to mark this radio station as broken? It will eventually get deleted if enough people do that! More information on that on the feeds homepage: http://www.radio-browser.info/"))
         response = message.run()
-        if response == Gtk.RESPONSE_YES:
+        if response == Gtk.ResponseType.YES:
             params = urllib.parse.urlencode({'action': 'negativevote', 'id': station.id})
             f = urllib.request.urlopen("http://www.radio-browser.info/?%s" % params)
             f.read()
@@ -182,29 +183,31 @@ class FeedBoard(Feed):
         dialog = PostStationDialog()
 
         LanguageList = Gtk.ListStore(str)
+        print(self.handler.languages)
         for language in self.handler.languages:
             LanguageList.append([language])
         LanguageList.set_sort_column_id(0, Gtk.SortType.ASCENDING)
         dialog.StationLanguage.set_model(LanguageList)
-        dialog.StationLanguage.set_text_column(0)
+        dialog.StationLanguage.set_entry_text_column(0)
 
         CountryList = Gtk.ListStore(str)
+        print(self.handler.countries)
         for country in self.handler.countries:
             CountryList.append([country])
         CountryList.set_sort_column_id(0, Gtk.SortType.ASCENDING)
         dialog.StationCountry.set_model(CountryList)
-        dialog.StationCountry.set_text_column(0)
+        dialog.StationCountry.set_entry_text_column(0)
 
         while True:
             def show_message(message):
-                info_dialog = Gtk.MessageDialog(parent=dialog, buttons=Gtk.BUTTONS_OK, message_format=message)
+                info_dialog = Gtk.MessageDialog(parent=dialog, buttons=Gtk.ButtonsType.OK, message_format=message)
                 info_dialog.run()
                 info_dialog.destroy()
 
             response = dialog.run()
-            if response == Gtk.RESPONSE_CANCEL:
+            if response == Gtk.ResponseType.CANCEL:
                 break
-            if response == Gtk.RESPONSE_OK:
+            if response == Gtk.ResponseType.OK:
                 Name = dialog.StationName.get_text().strip()
                 URL = dialog.StationUrl.get_text().strip()
                 Homepage = dialog.StationHomepage.get_text().strip()

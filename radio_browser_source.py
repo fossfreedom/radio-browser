@@ -60,6 +60,7 @@ GLib.threads_init()
 class RadioBrowserSource(RB.StreamingSource):
     def __init__(self):
         self.hasActivated = False
+        self.feeds = []
         RB.StreamingSource.__init__(self, name="RadioBrowserPlugin")
 
     def do_get_status(self, *args):
@@ -235,6 +236,9 @@ class RadioBrowserSource(RB.StreamingSource):
             settings.set_property("gtk_button_images", True)
             #Gtk.Settings.gtk_button_images(True)
 
+            for feed in self.searchEngines():
+                self.feeds.append(feed)
+
             self.event_page_switch(_, _, 0)
 
         # rhythmbox 0.13.3 does not have the following method
@@ -267,7 +271,7 @@ class RadioBrowserSource(RB.StreamingSource):
         self.station_actions = {}
 
         # check each engine for search method
-        for feed in self.searchEngines():
+        for feed in self.feeds:
             try:
                 feed.search
             except:
@@ -591,7 +595,14 @@ class RadioBrowserSource(RB.StreamingSource):
 
         # if some item is selected
         if not tree_iter == None:
+            text = model.get_value(tree_iter, 0)
             obj = model.get_value(tree_iter,1)
+            if not obj:
+                for feed in self.feeds:
+                    if feed.name() in text:
+                        obj = feed
+                        break
+
             self.update_info_box(obj,info_box)
 
     def update_info_box(self, obj, info_box):
@@ -714,7 +725,9 @@ class RadioBrowserSource(RB.StreamingSource):
         def button_station_action_handler(widget, action, station):
             action.call(self, station)
 
+        print ("1", obj)
         if isinstance(obj, Feed):
+            print ("2")
             feed = obj
             if os.path.isfile(feed.filename):
                 button = Gtk.Button(_("Redownload"))
@@ -725,6 +738,7 @@ class RadioBrowserSource(RB.StreamingSource):
             button_box.pack_start(button, False, False, 0)
 
             for action in feed.get_feed_actions():
+                print ("3")
                 button = Gtk.Button(action.name)
                 button.connect("clicked", button_action_handler, action)
                 button_box.pack_start(button, False, False, 0)
@@ -1205,6 +1219,7 @@ class RadioBrowserSource(RB.StreamingSource):
         Gdk.threads_leave()
 
         # create main feed root item
+        print (feed, parent)
         current_iter = self.tree_store.append(parent, (feed.name(), feed))
 
         # initialize dicts for iters
