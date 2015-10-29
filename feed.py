@@ -133,6 +133,7 @@ class Feed:
 
         try:
             local_mod = datetime.datetime.fromtimestamp(os.path.getmtime(self.filename))
+            local_mod += datetime.timedelta(days=7)
         except:
             print("could not load local file:" + self.filename)
             download = True
@@ -140,9 +141,12 @@ class Feed:
         self.getRemoteFileInfo()
 
         if self.remote_mod > local_mod:
-            print("Local file older than 1 day: remote(" + str(self.remote_mod) + ") local(" + str(local_mod) + ")")
+            print("Local file older than 7 days: remote(" + str(self.remote_mod) + ") local(" + str(local_mod) + ")")
             # change date is different -> download
             download = True
+        else:
+            print("Local file newer than 7 days: remote(" + str(self.remote_mod) + ") local(" + str(local_mod) + ")")
+
 
         if download:
             self.download()
