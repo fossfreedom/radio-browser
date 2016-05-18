@@ -110,7 +110,7 @@ class Feed:
         try:
             urlparts = urlparse(self.uri)
             conn = http.client.HTTPConnection(urlparts.netloc)
-            conn.request("HEAD", urlparts.path)
+            conn.request("HEAD", urlparts.path, headers={'User-Agent': USER_AGENT})
             res = conn.getresponse()
             for key, value in res.getheaders():
                 if key == "last-modified":
