@@ -50,8 +50,9 @@ from board_handler import BoardHandler
 from radiotime_handler import FeedRadioTime
 from radiotime_handler import FeedRadioTimeLocal
 
-BOARD_ROOT = "http://www.radio-browser.info/webservice/"
-USER_AGENT = "Rhythmbox Radio Browser 3.0"
+from constants import _Const
+CONST = _Const()
+
 RECENTLY_USED_FILENAME = "recently2.bin"
 BOOKMARKS_FILENAME = "bookmarks2.bin"
 
@@ -308,7 +309,7 @@ class RadioBrowserSource(RB.StreamingSource):
         # download statistics
         statisticsStr = ""
         try:
-            remotefile = urllib.request.urlopen(urllib.request.Request(BOARD_ROOT + "xml/stations/topclick/25", headers={'User-Agent': USER_AGENT}))
+            remotefile = urllib.request.urlopen(urllib.request.Request(CONST.BOARD_ROOT + "xml/stations/topclick/25", headers={'User-Agent': CONST.USER_AGENT}))
             statisticsStr = remotefile.read()
 
         except Exception as e:
@@ -348,10 +349,10 @@ class RadioBrowserSource(RB.StreamingSource):
             data = self.load_from_file(os.path.join(self.cache_dir, BOOKMARKS_FILENAME))
             if data is None:
                 data = {}
-                
+
             if station.server_name not in data:
                 data[station.server_name] = station
-                
+
             self.save_to_file(os.path.join(self.cache_dir, BOOKMARKS_FILENAME), data)
 
             self.refill_favourites()
@@ -868,7 +869,7 @@ class RadioBrowserSource(RB.StreamingSource):
         print("transmit_station")
         if station.type == "Board":
             """ this gets the decoded url, and also does register the click for statistics """
-            f = urllib.request.urlopen(urllib.request.Request(BOARD_ROOT + "xml/url/"+ station.id, headers={'User-Agent': USER_AGENT}))
+            f = urllib.request.urlopen(urllib.request.Request(CONST.BOARD_ROOT + "xml/url/"+ station.id, headers={'User-Agent': CONST.USER_AGENT}))
             f.read()
             print("Transmit station '" + str(station.server_name) + "' OK")
 
@@ -1444,4 +1445,3 @@ class RadioBrowserSource(RB.StreamingSource):
 
 
 GObject.type_register(RadioBrowserSource)
-
