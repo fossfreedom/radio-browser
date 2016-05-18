@@ -51,6 +51,7 @@ class BoardHandler(xml.sax.handler.ContentHandler):
             self.entry.negativevotes = attributes.get("negativevotes")
             self.entry.homepage = attributes.get("homepage")
             self.entry.icon_src = attributes.get("favicon")
+            self.entry.bitrate = attributes.get("bitrate")
             try:
                 self.entry.clickcount = attributes.get("clickcount")
             except:
