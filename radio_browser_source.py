@@ -668,6 +668,7 @@ class RadioBrowserSource(RB.StreamingSource):
             add_label(_("Name"), station.server_name)
             add_label(_("Tags"), station.genre)
             add_label(_("Bitrate"), station.bitrate)
+            add_label(_("Codec"), station.codec)
             add_label(_("Server type"), station.server_type)
             add_label(_("Homepage"), station.homepage)
             add_label(_("Current song (on last refresh)"), station.current_song)
@@ -1299,8 +1300,9 @@ class RadioBrowserSource(RB.StreamingSource):
                 br = station.bitrate
                 try:
                     br_int = int(br)
-                    br = str((((br_int - 1) / 32) + 1) * 32)
                     if br_int > 512:
+                        br = _("Invalid")
+                    if br_int == 0:
                         br = _("Invalid")
                 except:
                     pass
