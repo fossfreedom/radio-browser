@@ -25,6 +25,8 @@ from feed import Feed
 from feed import FeedAction
 from feed import FeedStationAction
 
+BOARD_ROOT = "http://www.radio-browser.info/webservice/"
+USER_AGENT = "Rhythmbox Radio Browser 3.0"
 
 class BoardHandler(xml.sax.handler.ContentHandler):
     def __init__(self):
@@ -118,7 +120,6 @@ class PostStationDialog(Gtk.Dialog):
         self.set_position(Gtk.WindowPosition.CENTER)
         self.show_all()
 
-
 class FeedBoard(Feed):
     def __init__(self, cache_dir, status_change_handler):
         Feed.__init__(self)
@@ -126,7 +127,7 @@ class FeedBoard(Feed):
         self.handler = BoardHandler()
         self.cache_dir = cache_dir
         self.filename = os.path.join(self.cache_dir, "board.xml")
-        self.uri = "http://www.radio-browser.info/xml.php"
+        self.uri = BOARD_ROOT + "xml/stations"
         self.status_change_handler = status_change_handler
 
     def name(self):
@@ -156,8 +157,7 @@ class FeedBoard(Feed):
             "Do you really want to vote for this station? It means, that you like it, and you want more people to know, that this is a good station."))
         response = message.run()
         if response == Gtk.ResponseType.YES:
-            params = urllib.parse.urlencode({'action': 'vote', 'id': station.id})
-            f = urllib.request.urlopen("http://www.radio-browser.info/?%s" % params)
+            f = urllib.request.urlopen(urllib.request.Request(BOARD_ROOT + "xml/vote/%d" % station.getId(), headers={'User-Agent': USER_AGENT}))
             f.read()
             source.refill_list()
         message.destroy()
@@ -235,9 +235,9 @@ class FeedBoard(Feed):
                         continue
 
                 params = urllib.parse.urlencode(
-                    {'action': 'add', 'name': Name, 'url': URL, 'homepage': Homepage, 'favicon': Favicon, 'tags': Tags,
+                    {'name': Name, 'url': URL, 'homepage': Homepage, 'favicon': Favicon, 'tags': Tags,
                      'language': Language, 'country': Country})
-                f = urllib.request.urlopen("http://www.radio-browser.info/?%s" % params)
+                f = urllib.request.urlopen(urllib.request.Request(BOARD_ROOT + "add?%s" % params, headers={'User-Agent': USER_AGENT}))
                 f.read()
 
                 show_message(_("Station successfully posted"))

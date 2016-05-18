@@ -50,7 +50,8 @@ from board_handler import BoardHandler
 from radiotime_handler import FeedRadioTime
 from radiotime_handler import FeedRadioTimeLocal
 
-BOARD_ROOT = "http://www.radio-browser.info/"
+BOARD_ROOT = "http://www.radio-browser.info/webservice/"
+USER_AGENT = "Rhythmbox Radio Browser 3.0"
 RECENTLY_USED_FILENAME = "recently2.bin"
 BOOKMARKS_FILENAME = "bookmarks2.bin"
 
@@ -307,7 +308,7 @@ class RadioBrowserSource(RB.StreamingSource):
         # download statistics
         statisticsStr = ""
         try:
-            remotefile = urllib.request.urlopen("http://www.radio-browser.info/topclick.php?limit=10")
+            remotefile = urllib.request.urlopen(urllib.request.Request(BOARD_ROOT + "xml/stations/topclick/25", headers={'User-Agent': USER_AGENT}))
             statisticsStr = remotefile.read()
 
         except Exception as e:
@@ -865,11 +866,11 @@ class RadioBrowserSource(RB.StreamingSource):
 
     def transmit_station(self, station):
         print("transmit_station")
-        params = urllib.parse.urlencode(
-            {'action': 'clicked', 'name': station.server_name, 'url': station.getRealURL(), 'source': station.type})
-        f = urllib.request.urlopen(BOARD_ROOT + "?%s" % params)
-        f.read()
-        print("Transmit station '" + str(station.server_name) + "' OK")
+        if station.type == "Board":
+            """ this gets the decoded url, and also does register the click for statistics """
+            f = urllib.request.urlopen(urllib.request.Request(BOARD_ROOT + "xml/url/"+ station.id, headers={'User-Agent': USER_AGENT}))
+            f.read()
+            print("Transmit station '" + str(station.server_name) + "' OK")
 
     """ transmits title information to board """
     """def transmit_title(self,title):

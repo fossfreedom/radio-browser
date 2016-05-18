@@ -25,6 +25,7 @@ import xml.sax.handler
 
 from radio_station import RadioStation
 
+USER_AGENT = "Rhythmbox Radio Browser 3.0"
 
 class FeedAction:
     def __init__(self, feed, name, func):
@@ -80,7 +81,7 @@ class Feed:
             pass
 
         try:
-            remotefile = urllib.request.urlopen(self.uri)
+            remotefile = urllib.request.urlopen(urllib.request.Request(self.uri, headers={'User-Agent': USER_AGENT}))
             chunksize = 100
             data = ""
             current = 0
