@@ -7,6 +7,9 @@ def constant(f):
 
 class _Const(object):
     @constant
+    def VERSION():
+        return "3.0"
+    @constant
     def USER_AGENT():
         return "Rhythmbox Radio Browser 3.0"
     @constant
