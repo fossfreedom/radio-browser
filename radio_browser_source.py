@@ -668,7 +668,6 @@ class RadioBrowserSource(RB.StreamingSource):
             add_label(_("Name"), station.server_name)
             add_label(_("Tags"), station.genre)
             add_label(_("Bitrate"), station.bitrate)
-            add_label(_("Codec"), station.codec)
             add_label(_("Server type"), station.server_type)
             add_label(_("Homepage"), station.homepage)
             add_label(_("Current song (on last refresh)"), station.current_song)
