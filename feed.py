@@ -25,6 +25,8 @@ import xml.sax.handler
 
 from radio_station import RadioStation
 
+from constants import _Const
+CONST = _Const()
 
 class FeedAction:
     def __init__(self, feed, name, func):
@@ -80,7 +82,7 @@ class Feed:
             pass
 
         try:
-            remotefile = urllib.request.urlopen(self.uri)
+            remotefile = urllib.request.urlopen(urllib.request.Request(self.uri, headers={'User-Agent': CONST.USER_AGENT}))
             chunksize = 100
             data = ""
             current = 0
@@ -109,7 +111,7 @@ class Feed:
         try:
             urlparts = urlparse(self.uri)
             conn = http.client.HTTPConnection(urlparts.netloc)
-            conn.request("HEAD", urlparts.path)
+            conn.request("HEAD", urlparts.path, headers={'User-Agent': CONST.USER_AGENT})
             res = conn.getresponse()
             for key, value in res.getheaders():
                 if key == "last-modified":
