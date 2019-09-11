@@ -32,6 +32,7 @@ For a system wide install then:
 git clone https://github.com/fossfreedom/radio-browser -b rb3
 cd radio-browser
 sudo make install
+sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
 </pre>
 
 Then launch rhythmbox and enable the plugin "Internet Radio Browser"
