@@ -14,4 +14,4 @@ class _Const(object):
         return "Rhythmbox Radio Browser 3.0"
     @constant
     def BOARD_ROOT():
-        return "http://www.radio-browser.info/webservice/"
+        return "http://api.radio-browser.info/"
